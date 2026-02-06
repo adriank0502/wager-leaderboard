@@ -1,11 +1,21 @@
 import { LeaderboardEntry } from '@/types/leaderboard';
+import { EmptyLeaderboard } from './EmptyLeaderboard';
 
 interface NewLeaderboardTableProps {
   entries: LeaderboardEntry[];
+  currentUser?: LeaderboardEntry | null;
 }
 
-export function NewLeaderboardTable({ entries }: NewLeaderboardTableProps) {
-  if (entries.length === 0) return null;
+export function NewLeaderboardTable({ entries, currentUser }: NewLeaderboardTableProps) {
+  if (entries.length === 0) {
+    return <EmptyLeaderboard />;
+  }
+  
+  // Check if current user is in the displayed entries
+  const isUserInList = (entry: LeaderboardEntry) => {
+    // Check both the me field and uuid comparison
+    return entry.me === true || (currentUser && entry.player.uuid === currentUser.player.uuid);
+  };
 
   const formatValue = (value: string) => {
     const num = parseFloat(value.replace(/,/g, ''));
@@ -46,7 +56,7 @@ export function NewLeaderboardTable({ entries }: NewLeaderboardTableProps) {
           {/* Entries */}
           <div className="flex flex-col relative">
             {entries.map((entry) => (
-              <div key={entry.player.uuid} className="group relative leaderboard-row">
+              <div key={entry.player.uuid} className={`group relative leaderboard-row ${isUserInList(entry) ? 'bg-[#85C7FF]/5' : ''}`}>
                 {/* Desktop Row */}
                 <div className="hidden sm:grid relative grid-cols-[50px_2fr_1.2fr_1.2fr] items-center gap-4 py-3.5 px-5 transition-all duration-200">
                   <div className="absolute inset-0 bg-[#526197]/0 group-hover:bg-[#526197]/5 transition-colors duration-200" />
@@ -74,6 +84,9 @@ export function NewLeaderboardTable({ entries }: NewLeaderboardTableProps) {
                     </div>
                     <span className="truncate font-semibold text-sm transition-colors text-white">
                       {entry.player.username}
+                      {isUserInList(entry) && (
+                        <span className="ml-2 text-xs text-[#85C7FF] font-bold">(You)</span>
+                      )}
                     </span>
                   </div>
                   
@@ -112,6 +125,9 @@ export function NewLeaderboardTable({ entries }: NewLeaderboardTableProps) {
                   <div className="flex-1 min-w-0 relative z-10">
                     <span className="block truncate font-semibold text-sm text-white">
                       {entry.player.username}
+                      {isUserInList(entry) && (
+                        <span className="ml-1 text-xs text-[#85C7FF] font-bold">(You)</span>
+                      )}
                     </span>
                     <span className="text-[11px] text-[#E8E5FF]/50 font-medium tabular-nums">
                       ${formatValue(entry.value)} wagered
