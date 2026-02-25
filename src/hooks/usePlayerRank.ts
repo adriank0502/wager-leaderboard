@@ -30,7 +30,7 @@ interface RankResponse {
 
 export function usePlayerRank({ 
   tournamentId, 
-  apiHost = 'https://wager-dev-api.sgldemo.xyz',
+  apiHost = 'https://api.wager.com',
   useMockData = false 
 }: UsePlayerRankOptions) {
   const [playerRank, setPlayerRank] = useState<LeaderboardEntry | null>(null);

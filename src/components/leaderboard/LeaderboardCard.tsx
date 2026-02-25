@@ -10,6 +10,7 @@ export function LeaderboardCard() {
   const { topThree, restOfLeaderboard, isLoading, error, refetch } = useLeaderboard({
     tournamentId: '121134',
     useMockData: true, // Using mock data for now
+    apiHost: import.meta.env.VITE_API_HOST || 'https://api.wager.com',
   });
 
   return (
