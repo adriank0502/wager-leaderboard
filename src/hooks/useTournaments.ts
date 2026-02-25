@@ -1,12 +1,36 @@
 import { useState, useEffect } from 'react';
 
 interface Tournament {
-  id: string;
+  id: number | string;
   name: string;
-  prize_pool?: string;
+  code?: string;
+  status?: number;
+  description?: string;
+  start_at?: string;
+  end_at?: string;
   start_date?: string;
   end_date?: string;
-  status?: string;
+  status_name?: string;
+  progress_status?: string;
+  is_joined?: boolean;
+  mechanic_type?: number;
+  prize_pool?: string;
+  currency?: any;
+  converted?: any;
+  mechanic_type_name?: string;
+  leaderboard?: any;
+  current_tournament?: {
+    id: number;
+    name: string;
+    code: string;
+    status: number;
+    status_name: string;
+    start_at: string;
+    end_at: string;
+    is_settled: number;
+  };
+  previous_tournament?: any;
+  cms_property?: any;
   type?: string;
 }
 
@@ -20,7 +44,7 @@ interface UseTournamentsOptions {
 }
 
 export function useTournaments({ 
-  apiHost = 'https://wager-dev-api.sgldemo.xyz',
+  apiHost = 'https://api.wager.com',
   useMockData = false 
 }: UseTournamentsOptions = {}) {
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
@@ -85,8 +109,21 @@ export function useTournaments({
           
           // Set the first tournament as active
           if (result.data && result.data.length > 0) {
-            console.log('✅ Active tournament:', result.data[0]);
-            setActiveTournament(result.data[0]);
+            const tournament = result.data[0];
+            console.log('✅ Active tournament:', tournament);
+            
+            // Use current_tournament.id if available, otherwise use main tournament id
+            const tournamentId = tournament.current_tournament?.id 
+              ? tournament.current_tournament.id 
+              : tournament.id;
+            
+            // Create tournament object with the correct ID
+            const tournamentToUse = { ...tournament, id: tournamentId };
+            
+            setActiveTournament(tournamentToUse);
+            console.log('✅ Using tournament ID:', tournamentId);
+            console.log('✅ Main tournament ID:', tournament.id);
+            console.log('✅ Current tournament ID:', tournament.current_tournament?.id);
           } else {
             console.warn('⚠️ No tournaments found in response');
           }

@@ -153,16 +153,16 @@ const mockData: LeaderboardEntry[] = [
 ];
 
 interface UseLeaderboardOptions {
-  tournamentId?: string;
+  tournamentId?: string | null;
   useMockData?: boolean;
   apiHost?: string;
   includeMe?: boolean;
 }
 
 export function useLeaderboard({ 
-  tournamentId = '1', 
+  tournamentId, 
   useMockData = true,
-  apiHost = 'https://wager.com',
+  apiHost = 'https://api.wager.com',
   includeMe = true
 }: UseLeaderboardOptions = {}) {
   const [data, setData] = useState<LeaderboardEntry[]>([]);
@@ -178,6 +178,13 @@ export function useLeaderboard({
   }));
 
   const fetchLeaderboard = useCallback(async () => {
+    // Guard: Don't fetch if no tournament ID
+    if (!tournamentId || tournamentId.trim() === '') {
+      console.warn('⚠️ Cannot fetch leaderboard: No tournament ID provided');
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -264,8 +271,19 @@ export function useLeaderboard({
   }, [tournamentId, useMockData, apiHost, includeMe]);
 
   useEffect(() => {
-    fetchLeaderboard();
-  }, [fetchLeaderboard]);
+    // Only fetch if we have a valid tournament ID (not null, not undefined, not empty)
+    if (tournamentId && tournamentId.trim() !== '') {
+      console.log('🔄 useLeaderboard: Fetching with tournament ID:', tournamentId);
+      fetchLeaderboard();
+    } else {
+      // Reset state if no valid tournament ID
+      console.log('⏸️ useLeaderboard: Waiting for tournament ID...');
+      setIsLoading(false);
+      setData([]);
+      setCurrentUser(null);
+      setHasMore(false);
+    }
+  }, [fetchLeaderboard, tournamentId]);
 
   const topThree = data.filter((entry) => entry.rank <= 3);
   const restOfLeaderboard = data.filter((entry) => entry.rank > 3);

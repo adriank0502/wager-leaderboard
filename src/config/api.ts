@@ -1,7 +1,7 @@
 // API Configuration
 export const API_CONFIG = {
   // Base API host - change {{host}} to your actual domain
-  BASE_URL: import.meta.env.VITE_API_HOST || 'https://wager.com',
+  BASE_URL: import.meta.env.VITE_API_HOST || 'https://api.wager.com',
   
   // API endpoints
   ENDPOINTS: {

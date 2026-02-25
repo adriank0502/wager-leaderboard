@@ -7,20 +7,33 @@ import { NewPodiumSection } from '@/components/leaderboard/NewPodiumSection';
 import { NewLeaderboardTable } from '@/components/leaderboard/NewLeaderboardTable';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useTournaments } from '@/hooks/useTournaments';
+import { API_CONFIG } from '@/config/api';
 
 const Index = () => {
   // Fetch active tournament
   const { activeTournament, isLoading: tournamentsLoading } = useTournaments({
-    apiHost: import.meta.env.VITE_API_HOST || 'https://wager-dev-api.sgldemo.xyz',
+    apiHost: import.meta.env.VITE_API_HOST || 'https://api.wager.com',
     useMockData: false, // Now using real API data
   });
 
+  // Get tournamentId from activeTournament
+  // Only use tournament ID from API, don't use default while loading
+  // Convert to string if it's a number (API returns number, but we need string for URL)
+  const tournamentId = activeTournament?.id 
+    ? String(activeTournament.id) 
+    : null; // Don't use default - wait for tournaments to load
+
+  // Debug logging
+  console.log('📋 Index: activeTournament:', activeTournament);
+  console.log('📋 Index: tournamentId:', tournamentId);
+  console.log('📋 Index: tournamentsLoading:', tournamentsLoading);
+
   // Fetch leaderboard for the active tournament
-  // Using tournament ID 121172 which has data
+  // Only fetch if we have a valid tournament ID from the API
   const { topThree, restOfLeaderboard, currentUser, isLoading: leaderboardLoading, error } = useLeaderboard({
-    tournamentId: '121172', // Using tournament 121172 which has data
+    tournamentId: tournamentId || undefined, // Use tournament ID from activeTournament, or undefined if not loaded yet
     useMockData: false, // Now using real API data
-    apiHost: import.meta.env.VITE_API_HOST || 'https://wager-dev-api.sgldemo.xyz',
+    apiHost: import.meta.env.VITE_API_HOST || 'https://api.wager.com',
     includeMe: true, // Include current user's position
   });
 
