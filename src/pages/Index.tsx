@@ -31,9 +31,6 @@ const Index = () => {
       ? String(activeTournament.id)
       : null;
 
-  console.log('📋 Tournament ID source:', envTournamentId ? 'VITE_TOURNAMENT_ID env var' : 'tournaments API');
-  console.log('📋 Tournament ID:', tournamentId);
-
   // Fetch leaderboard for the active tournament
   const { topThree, restOfLeaderboard, currentUser, isLoading: leaderboardLoading, error } = useLeaderboard({
     tournamentId: tournamentId || undefined,

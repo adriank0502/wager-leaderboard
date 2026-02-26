@@ -37,7 +37,6 @@ class LeaderboardCache {
       // Store with expiration
       await redis.setex(key, ttl, JSON.stringify(cached));
     } catch (error) {
-      console.error('❌ Redis cache set error:', error);
       // Fallback: continue without caching if Redis fails
     }
   }
@@ -57,7 +56,6 @@ class LeaderboardCache {
 
       return JSON.parse(cached) as CachedLeaderboard;
     } catch (error) {
-      console.error('❌ Redis cache get error:', error);
       return null;
     }
   }
@@ -72,7 +70,6 @@ class LeaderboardCache {
       const exists = await redis.exists(key);
       return exists === 1;
     } catch (error) {
-      console.error('❌ Redis cache has error:', error);
       return false;
     }
   }
@@ -93,7 +90,7 @@ class LeaderboardCache {
         }
       }
     } catch (error) {
-      console.error('❌ Redis cache clear error:', error);
+      // Silently fail on clear error
     }
   }
 
@@ -107,7 +104,6 @@ class LeaderboardCache {
       const ttl = await redis.ttl(key);
       return ttl;
     } catch (error) {
-      console.error('❌ Redis cache TTL error:', error);
       return -1;
     }
   }
@@ -121,7 +117,7 @@ class LeaderboardCache {
     try {
       await redis.expire(key, additionalSeconds);
     } catch (error) {
-      console.error('❌ Redis cache extend error:', error);
+      // Silently fail on extend error
     }
   }
 }

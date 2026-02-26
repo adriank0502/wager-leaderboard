@@ -49,7 +49,6 @@ export function usePlayerRank({
           setPlayerRank(null);
         } else {
           const url = `${apiHost}/player/api/v1/tournaments/${tournamentId}/rank`;
-          console.log('🔄 Fetching player rank from:', url);
           
           const response = await fetch(url, {
             method: 'GET',
@@ -60,32 +59,24 @@ export function usePlayerRank({
             credentials: 'include', // Include cookies for authentication
           });
 
-          console.log('📡 Rank response status:', response.status);
-
           if (!response.ok) {
             if (response.status === 404) {
               // User not ranked yet - this is normal
-              console.log('ℹ️ User not ranked yet (404)');
               setPlayerRank(null);
               return;
             }
             const errorText = await response.text();
-            console.error('❌ Rank API Error:', errorText);
             throw new Error(`Failed to fetch player rank: ${response.status}`);
           }
 
           const responseText = await response.text();
-          console.log('📄 Rank raw response:', responseText);
           
           let result: RankResponse;
           try {
             result = JSON.parse(responseText);
           } catch (parseError) {
-            console.error('❌ Rank JSON Parse Error:', parseError);
             throw new Error('Invalid JSON response from rank API');
           }
-          
-          console.log('✅ Parsed rank data:', result);
           
           // Convert to LeaderboardEntry format
           const rankEntry: LeaderboardEntry = {
@@ -109,11 +100,9 @@ export function usePlayerRank({
           };
           
           setPlayerRank(rankEntry);
-          console.log('👤 Player rank:', result.rank);
         }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'An error occurred';
-        console.error('❌ Rank fetch error:', errorMessage);
         setError(errorMessage);
         setPlayerRank(null);
       } finally {
