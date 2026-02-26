@@ -1,44 +1,129 @@
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { useState } from 'react';
+import { BRANDING } from '@/config/branding';
 
 export function NewNavbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const isButcherTheme = BRANDING.streamerCode === 'butcher';
+  const primaryColor = isButcherTheme ? BRANDING.theme.secondaryColor : '#85C7FF';
+  const bgGradient = isButcherTheme
+    ? `linear-gradient(135deg, ${BRANDING.theme.secondaryColor}15 0%, rgba(26, 0, 0, 0.5) 50%, ${BRANDING.theme.primaryColor}10 100%)`
+    : 'linear-gradient(135deg, rgba(133, 199, 255, 0.05) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(153, 208, 255, 0.05) 100%)';
+  const borderColor = isButcherTheme ? `${primaryColor}30` : 'rgba(255, 255, 255, 0.1)';
+  const highlightColor = isButcherTheme ? `${primaryColor}60` : 'rgba(255, 255, 255, 0.3)';
 
   return (
     <>
       {/* Desktop Navigation */}
       <div className="hidden md:flex fixed top-0 left-0 right-0 z-50 justify-center pointer-events-none">
-        <nav className="pointer-events-auto relative mt-6 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] w-[92%] max-w-5xl rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3),0_0_0_1px_rgba(255,255,255,0.05)_inset] backdrop-blur-2xl border border-white/10 flex items-center justify-between p-2.5 pl-4 nav-bar">
+        <nav 
+          className="pointer-events-auto relative mt-6 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] w-[92%] max-w-5xl rounded-2xl backdrop-blur-2xl flex items-center justify-between p-2.5 pl-4"
+          style={{
+            background: bgGradient,
+            border: `1px solid ${borderColor}`,
+            boxShadow: isButcherTheme
+              ? `0 8px 32px rgba(139, 0, 0, 0.4), 0 0 0 1px ${primaryColor}20 inset, 0 0 40px ${primaryColor}10`
+              : '0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.05) inset',
+          }}
+        >
           {/* Gradient overlay */}
-          <div className="absolute inset-0 rounded-[inherit] bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-50 pointer-events-none" />
+          <div 
+            className="absolute inset-0 rounded-[inherit] pointer-events-none opacity-50"
+            style={{
+              background: isButcherTheme
+                ? `linear-gradient(to bottom right, ${primaryColor}20, transparent, transparent)`
+                : 'linear-gradient(to bottom right, rgba(255, 255, 255, 0.1), transparent, transparent)',
+            }}
+          />
           
-          {/* Top highlight */}
-          <div className="absolute top-0 left-[10%] right-[10%] h-[1px] bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+          {/* Top highlight - blood effect */}
+          <div 
+            className="absolute top-0 left-[10%] right-[10%] h-[2px]"
+            style={{
+              background: `linear-gradient(to right, transparent, ${highlightColor}, transparent)`,
+              boxShadow: isButcherTheme ? `0 0 10px ${primaryColor}40` : undefined,
+            }}
+          />
           
           {/* Logo and nav links */}
           <div className="flex items-center gap-2 relative z-10">
             <a className="flex items-center gap-3 pr-3 group/logo" href="/">
-              <div className="relative w-11 h-11 rounded-full p-[2px] bg-gradient-to-br from-[#85C7FF]/40 to-[#99D0FF]/40 group-hover/logo:from-[#85C7FF]/60 group-hover/logo:to-[#99D0FF]/60 transition-all duration-300">
-                <div className="w-full h-full rounded-full bg-gradient-to-br from-[#1e2642] to-[#1a1f3a] flex items-center justify-center overflow-hidden">
+              <div 
+                className="relative w-11 h-11 rounded-full p-[2px] transition-all duration-300"
+                style={{
+                  background: isButcherTheme
+                    ? `linear-gradient(to bottom right, ${primaryColor}60, ${BRANDING.theme.accentColor}60)`
+                    : 'linear-gradient(to bottom right, rgba(133, 199, 255, 0.4), rgba(153, 208, 255, 0.4))',
+                  boxShadow: isButcherTheme ? `0 0 20px ${primaryColor}40` : undefined,
+                }}
+                onMouseEnter={(e) => {
+                  if (isButcherTheme) {
+                    e.currentTarget.style.boxShadow = `0 0 30px ${primaryColor}60`;
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (isButcherTheme) {
+                    e.currentTarget.style.boxShadow = `0 0 20px ${primaryColor}40`;
+                  }
+                }}
+              >
+                <div 
+                  className="w-full h-full rounded-full flex items-center justify-center overflow-hidden"
+                  style={{
+                    background: isButcherTheme
+                      ? 'linear-gradient(to bottom right, #1a0000, #2d0000)'
+                      : 'linear-gradient(to bottom right, #1e2642, #1a1f3a)',
+                  }}
+                >
                   <img 
-                    src="https://cdn-cms.wager.com/Logo/wager-logged.png" 
-                    alt="Wager Logo" 
+                    src="/favicon.png" 
+                    alt={`${BRANDING.streamerName} Logo`}
                     className="object-cover opacity-90 group-hover/logo:opacity-100 group-hover/logo:scale-110 transition-all duration-300 w-full h-full"
                   />
                 </div>
               </div>
               <div className="flex flex-col overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] w-24 opacity-100">
-                <span className="font-black text-base text-white leading-none tracking-tight">WAGER</span>
+                <span 
+                  className="font-black text-base leading-none tracking-tight"
+                  style={{
+                    color: isButcherTheme ? primaryColor : '#FFFFFF',
+                    textShadow: isButcherTheme ? `0 0 10px ${primaryColor}60` : undefined,
+                  }}
+                >
+                  {BRANDING.streamerName}
+                </span>
               </div>
             </a>
             
-            <div className="h-8 w-[1px] bg-gradient-to-b from-transparent via-white/20 to-transparent mx-1 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] opacity-100 scale-y-100" />
+            <div 
+              className="h-8 w-[1px] mx-1 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] opacity-100 scale-y-100"
+              style={{
+                background: `linear-gradient(to bottom, transparent, ${isButcherTheme ? primaryColor : 'rgba(255, 255, 255, 0.2)'}, transparent)`,
+              }}
+            />
             
             <div className="flex items-center gap-1">
-              <a className="relative px-5 py-2.5 text-sm font-bold text-white transition-all duration-300 group/link rounded-xl" href="/leaderboard">
+              <a 
+                className="relative px-5 py-2.5 text-sm font-black transition-all duration-300 group/link rounded-xl"
+                style={{
+                  color: isButcherTheme ? primaryColor : '#FFFFFF',
+                  textShadow: isButcherTheme ? `0 0 8px ${primaryColor}40` : undefined,
+                }}
+                href="/leaderboard"
+              >
                 Leaderboard
-                <span className="absolute left-1/2 bottom-1 w-0 h-[2px] bg-gradient-to-r from-[#85C7FF] to-[#99D0FF] rounded-full -translate-x-1/2 group-hover/link:w-8 shadow-[0_0_8px_#85C7FF] transition-all duration-300" />
+                <span 
+                  className="absolute left-1/2 bottom-1 w-0 h-[3px] rounded-full -translate-x-1/2 group-hover/link:w-8 transition-all duration-300"
+                  style={{
+                    background: isButcherTheme
+                      ? `linear-gradient(to right, ${primaryColor}, ${BRANDING.theme.accentColor})`
+                      : 'linear-gradient(to right, #85C7FF, #99D0FF)',
+                    boxShadow: isButcherTheme
+                      ? `0 0 15px ${primaryColor}`
+                      : '0 0 8px #85C7FF',
+                  }}
+                />
               </a>
               
             </div>
@@ -49,11 +134,31 @@ export function NewNavbar() {
             <a 
               target="_blank" 
               rel="noopener noreferrer"
-              className="group/cta relative inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full overflow-hidden bg-gradient-to-r from-[#85C7FF] to-[#99D0FF] hover:from-[#99D0FF] hover:to-[#85C7FF] transition-all duration-300 shadow-lg hover:shadow-[0_0_25px_rgba(133,199,255,0.4)]"
+              className="group/cta relative inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full overflow-hidden transition-all duration-300"
+              style={{
+                background: isButcherTheme
+                  ? `linear-gradient(to right, ${primaryColor}, ${BRANDING.theme.accentColor})`
+                  : 'linear-gradient(to right, #85C7FF, #99D0FF)',
+                boxShadow: isButcherTheme
+                  ? `0 0 20px ${primaryColor}50, 0 4px 15px rgba(139, 0, 0, 0.3)`
+                  : '0 4px 15px rgba(0, 0, 0, 0.2)',
+              }}
+              onMouseEnter={(e) => {
+                if (isButcherTheme) {
+                  e.currentTarget.style.boxShadow = `0 0 35px ${primaryColor}80, 0 6px 20px rgba(139, 0, 0, 0.5)`;
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (isButcherTheme) {
+                  e.currentTarget.style.boxShadow = `0 0 20px ${primaryColor}50, 0 4px 15px rgba(139, 0, 0, 0.3)`;
+                  e.currentTarget.style.transform = 'scale(1)';
+                }
+              }}
               href="https://wager.com"
             >
-              <span className="text-xs font-black uppercase tracking-widest text-black z-10">Play Now</span>
-              <svg className="w-3.5 h-3.5 text-black transition-transform group-hover/cta:translate-x-0.5 z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <span className="text-xs font-black uppercase tracking-widest text-white z-10">Play Now</span>
+              <svg className="w-3.5 h-3.5 text-white transition-transform group-hover/cta:translate-x-0.5 z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
               <div className="absolute inset-0 -translate-x-full group-hover/cta:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
@@ -69,9 +174,20 @@ export function NewNavbar() {
       <nav className="fixed md:hidden top-0 left-0 right-0 z-50 pointer-events-none">
         <div className="p-4 flex justify-between items-start">
           <div className="pointer-events-auto transition-all duration-500 opacity-100 scale-100 blur-0">
-            <div className="p-2 bg-[#0b101b]/80 backdrop-blur-md border border-white/10 rounded-full shadow-lg">
+            <div 
+              className="p-2 backdrop-blur-md border rounded-full shadow-lg"
+              style={{
+                background: isButcherTheme ? 'rgba(26, 0, 0, 0.8)' : 'rgba(11, 16, 27, 0.8)',
+                borderColor: isButcherTheme ? `${primaryColor}30` : 'rgba(255, 255, 255, 0.1)',
+                boxShadow: isButcherTheme ? `0 4px 15px rgba(139, 0, 0, 0.3), 0 0 20px ${primaryColor}20` : undefined,
+              }}
+            >
               <a className="block w-8 h-8 rounded-full overflow-hidden" href="/">
-                <img src="https://cdn-cms.wager.com/Logo/wager-logged.png" alt="Wager Logo" className="object-cover w-full h-full" />
+                <img 
+                  src="/favicon.png" 
+                  alt={`${BRANDING.streamerName} Logo`}
+                  className="object-cover w-full h-full" 
+                />
               </a>
             </div>
           </div>

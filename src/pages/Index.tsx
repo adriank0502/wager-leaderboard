@@ -8,6 +8,7 @@ import { NewLeaderboardTable } from '@/components/leaderboard/NewLeaderboardTabl
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useTournaments } from '@/hooks/useTournaments';
 import { API_CONFIG } from '@/config/api';
+import { BRANDING } from '@/config/branding';
 
 const Index = () => {
   const apiHost = import.meta.env.VITE_API_HOST || 'https://api.wager.com';
@@ -57,8 +58,8 @@ const Index = () => {
         <NewPrizeHero 
           prizeAmount="$40,000" 
           period="Monthly"
-          description="Sign up using referral code WAGER and start wagering to compete for prizes"
-          streamerName="WAGER"
+          description={BRANDING.customText?.heroDescription || `Sign up using referral code ${BRANDING.customText?.referralCode || BRANDING.streamerName} and start wagering to compete for prizes`}
+          streamerName={BRANDING.streamerName}
         />
         
         {/* Countdown Timer */}
