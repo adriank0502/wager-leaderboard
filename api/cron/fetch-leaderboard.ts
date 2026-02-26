@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { leaderboardCache } from '../lib/cache';
+import { leaderboardCache } from '../lib/cache.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Verify cron secret to prevent unauthorized access
@@ -13,7 +13,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const tournamentId = process.env.VITE_TOURNAMENT_ID;
 
     if (!tournamentId) {
-      console.error('❌ No tournament ID configured');
       return res.status(400).json({ error: 'No tournament ID configured' });
     }
 
@@ -30,7 +29,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('❌ API Error:', errorText);
       throw new Error(`Failed to fetch leaderboard: ${response.status} ${response.statusText}`);
     }
 
@@ -45,7 +43,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       timestamp: new Date().toISOString(),
     });
   } catch (error: any) {
-    console.error('❌ Cron job error:', error);
     return res.status(500).json({
       error: 'Failed to fetch leaderboard',
       message: error.message,

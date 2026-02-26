@@ -180,7 +180,6 @@ export function useLeaderboard({
   const fetchLeaderboard = useCallback(async () => {
     // Guard: Don't fetch if no tournament ID
     if (!tournamentId || tournamentId.trim() === '') {
-      console.warn('⚠️ Cannot fetch leaderboard: No tournament ID provided');
       setIsLoading(false);
       return;
     }
@@ -199,8 +198,6 @@ export function useLeaderboard({
         const includeParam = includeMe ? '&include_me=true' : '';
         const url = `${apiHost}/player/api/v1/tournaments/${tournamentId}/leaderboard?per_page=100${includeParam}`;
         
-        console.log('🔄 Fetching leaderboard from:', url);
-        
         const response = await fetch(url, {
           method: 'GET',
           headers: {
@@ -210,35 +207,22 @@ export function useLeaderboard({
           credentials: 'include', // Include cookies for authentication
         });
 
-        console.log('📡 Response status:', response.status);
-        console.log('📡 Response headers:', response.headers);
-
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('❌ API Error:', errorText);
           throw new Error(`Failed to fetch leaderboard data: ${response.status} ${response.statusText}`);
         }
 
         const responseText = await response.text();
-        console.log('📄 Raw response text:', responseText);
         
         let result: LeaderboardResponse;
         try {
           result = JSON.parse(responseText);
         } catch (parseError) {
-          console.error('❌ JSON Parse Error:', parseError);
-          console.error('❌ Response text:', responseText);
           throw new Error('Invalid JSON response from API');
         }
         
-        console.log('✅ Parsed leaderboard data:', result);
-        console.log('📊 Data array:', result.data);
-        console.log('📊 Number of entries:', result.data?.length || 0);
-        console.log('📊 Has more:', result.has_more);
-        
         // Check if data is actually an array
         if (!Array.isArray(result.data)) {
-          console.error('❌ Data is not an array!', typeof result.data, result.data);
           throw new Error('API response data is not an array');
         }
         
@@ -248,20 +232,9 @@ export function useLeaderboard({
         // Find current user in data (me: true)
         const userEntry = result.data?.find(entry => entry.me === true);
         setCurrentUser(userEntry || null);
-        
-        if (userEntry) {
-          console.log('👤 Current user found at rank:', userEntry.rank);
-        } else {
-          console.log('ℹ️ No current user found in leaderboard (not ranked or not logged in)');
-        }
-        
-        if (result.data.length === 0) {
-          console.warn('⚠️ API returned empty data array. This might be normal if no players are ranked yet.');
-        }
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred';
-      console.error('❌ Leaderboard fetch error:', errorMessage);
       setError(errorMessage);
       // Fall back to mock data on error
       setData(mockDataWithMe);
@@ -273,11 +246,9 @@ export function useLeaderboard({
   useEffect(() => {
     // Only fetch if we have a valid tournament ID (not null, not undefined, not empty)
     if (tournamentId && tournamentId.trim() !== '') {
-      console.log('🔄 useLeaderboard: Fetching with tournament ID:', tournamentId);
       fetchLeaderboard();
     } else {
       // Reset state if no valid tournament ID
-      console.log('⏸️ useLeaderboard: Waiting for tournament ID...');
       setIsLoading(false);
       setData([]);
       setCurrentUser(null);

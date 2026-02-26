@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { leaderboardCache } from './lib/cache';
+import { leaderboardCache } from './lib/cache.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Enable CORS
@@ -46,7 +46,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       timestamp: new Date(cached.timestamp).toISOString(),
     });
   } catch (error: any) {
-    console.error('❌ API error:', error);
     return res.status(500).json({
       error: 'Internal server error',
       message: error.message,
