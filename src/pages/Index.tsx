@@ -10,34 +10,38 @@ import { useTournaments } from '@/hooks/useTournaments';
 import { API_CONFIG } from '@/config/api';
 
 const Index = () => {
-  // Fetch active tournament
+  const apiHost = import.meta.env.VITE_API_HOST || 'https://api.wager.com';
+
+  // If VITE_TOURNAMENT_ID is set in Vercel env vars, skip the tournaments API call
+  const envTournamentId = API_CONFIG.TOURNAMENT_ID;
+
+  // Only fetch tournaments if no tournament ID is set in env vars
   const { activeTournament, isLoading: tournamentsLoading } = useTournaments({
-    apiHost: import.meta.env.VITE_API_HOST || 'https://api.wager.com',
-    useMockData: false, // Now using real API data
+    apiHost,
+    useMockData: !!envTournamentId, // Skip real API call if envTournamentId is set
   });
 
-  // Get tournamentId from activeTournament
-  // Only use tournament ID from API, don't use default while loading
-  // Convert to string if it's a number (API returns number, but we need string for URL)
-  const tournamentId = activeTournament?.id 
-    ? String(activeTournament.id) 
-    : null; // Don't use default - wait for tournaments to load
+  // Determine tournament ID:
+  // 1. Use VITE_TOURNAMENT_ID env var if set (per-streamer Vercel deployment)
+  // 2. Otherwise use the ID from the tournaments API response
+  const tournamentId = envTournamentId
+    ? String(envTournamentId)
+    : activeTournament?.id
+      ? String(activeTournament.id)
+      : null;
 
-  // Debug logging
-  console.log('📋 Index: activeTournament:', activeTournament);
-  console.log('📋 Index: tournamentId:', tournamentId);
-  console.log('📋 Index: tournamentsLoading:', tournamentsLoading);
+  console.log('📋 Tournament ID source:', envTournamentId ? 'VITE_TOURNAMENT_ID env var' : 'tournaments API');
+  console.log('📋 Tournament ID:', tournamentId);
 
   // Fetch leaderboard for the active tournament
-  // Only fetch if we have a valid tournament ID from the API
   const { topThree, restOfLeaderboard, currentUser, isLoading: leaderboardLoading, error } = useLeaderboard({
-    tournamentId: tournamentId || undefined, // Use tournament ID from activeTournament, or undefined if not loaded yet
-    useMockData: false, // Now using real API data
-    apiHost: import.meta.env.VITE_API_HOST || 'https://api.wager.com',
-    includeMe: true, // Include current user's position
+    tournamentId: tournamentId || undefined,
+    useMockData: false,
+    apiHost,
+    includeMe: true,
   });
 
-  const isLoading = tournamentsLoading || leaderboardLoading;
+  const isLoading = (!envTournamentId && tournamentsLoading) || leaderboardLoading;
 
   return (
     <div className="relative min-h-screen text-white overflow-hidden">
