@@ -1,3 +1,5 @@
+import { BRANDING } from '@/config/branding';
+
 interface NewPrizeHeroProps {
   prizeAmount?: string;
   period?: string;
@@ -6,11 +8,14 @@ interface NewPrizeHeroProps {
 }
 
 export function NewPrizeHero({ 
-  prizeAmount = "$40,000", 
+  prizeAmount = "$5,000", 
   period = "Monthly",
   description = "Sign up using referral code WAGER and start wagering to compete for prizes",
   streamerName = "WAGER"
 }: NewPrizeHeroProps) {
+  const isButcherTheme = BRANDING.streamerCode === 'butcher';
+  const bloodRed = isButcherTheme ? BRANDING.theme.secondaryColor : '#DC143C';
+  const bloodAccent = isButcherTheme ? BRANDING.theme.accentColor : '#FF6347';
   return (
     <section className="relative mx-auto max-w-6xl px-4 pt-32 pb-16 sm:pt-36 sm:pb-20 text-center">
       <div className="relative space-y-8">
@@ -41,34 +46,41 @@ export function NewPrizeHero({
           ))}
         </p>
         
-        {/* Partner badges */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 pt-4">
-          <a 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="transition-all hover:scale-110 hover:drop-shadow-[0_0_20px_rgba(133,199,255,0.4)]"
-            href="https://wager.com"
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-2xl sm:text-3xl font-black text-white">Wager.com</span>
+        {/* ButcherX branding */}
+        {isButcherTheme && (
+          <div className="flex items-center justify-center pt-6">
+            <div className="relative">
+              <h2 
+                className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tight relative"
+                style={{
+                  background: `linear-gradient(to bottom right, ${bloodRed}, ${bloodAccent}, ${bloodRed})`,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  filter: `drop-shadow(0 0 30px ${bloodRed}99)`,
+                  textShadow: `0 0 40px ${bloodRed}CC, 0 0 80px ${bloodRed}66`,
+                  letterSpacing: '0.05em',
+                }}
+              >
+                ButcherX
+              </h2>
+              {/* Glowing effect behind text */}
+              <div 
+                className="absolute inset-0 blur-[40px] opacity-50 -z-10"
+                style={{
+                  background: `radial-gradient(circle, ${bloodRed}99 0%, transparent 70%)`,
+                }}
+              />
+              {/* Animated pulse effect */}
+              <div 
+                className="absolute inset-0 blur-[60px] opacity-30 -z-10 animate-pulse"
+                style={{
+                  background: `radial-gradient(circle, ${bloodAccent}99 0%, transparent 70%)`,
+                }}
+              />
             </div>
-          </a>
-          
-          <div className="text-2xl sm:text-3xl font-black text-[#85C7FF]/40">×</div>
-          
-          <a 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="group transition-all hover:scale-110"
-            href="https://wager.com"
-          >
-            <img 
-              src="https://cdn-cms.wager.com/Logo/wager-logged.png" 
-              alt="Wager Logo" 
-              className="h-16 sm:h-20 w-auto object-contain transition-all duration-300 group-hover:drop-shadow-[0_0_15px_rgba(133,199,255,0.6)]"
-            />
-          </a>
-        </div>
+          </div>
+        )}
       </div>
     </section>
   );
