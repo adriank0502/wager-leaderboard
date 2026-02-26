@@ -1,5 +1,36 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { leaderboardCache } from '../lib/cache.js';
+import { Redis } from '@upstash/redis';
+
+// Initialize Redis client
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL || '',
+  token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
+});
+
+interface CachedLeaderboard {
+  data: any;
+  timestamp: number;
+  tournamentId: string;
+}
+
+// Cache helper functions
+const CACHE_PREFIX = 'leaderboard:';
+const DEFAULT_TTL = 300; // 5 minutes
+
+async function setCache(tournamentId: string, data: any, ttl: number = DEFAULT_TTL): Promise<void> {
+  const key = `${CACHE_PREFIX}${tournamentId}`;
+  const cached: CachedLeaderboard = {
+    data,
+    timestamp: Date.now(),
+    tournamentId,
+  };
+
+  try {
+    await redis.setex(key, ttl, JSON.stringify(cached));
+  } catch (error) {
+    // Fallback: continue without caching if Redis fails
+  }
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Verify cron secret to prevent unauthorized access
@@ -35,7 +66,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const data = await response.json();
     
     // Cache the data with 5 minute TTL
-    await leaderboardCache.set(tournamentId, data, 300);
+    await setCache(tournamentId, data, 300);
 
     return res.status(200).json({
       success: true,
@@ -49,4 +80,3 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 }
-
