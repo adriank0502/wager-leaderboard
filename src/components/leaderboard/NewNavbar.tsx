@@ -104,13 +104,12 @@ export function NewNavbar() {
             />
             
             <div className="flex items-center gap-1">
-              <a 
-                className="relative px-5 py-2.5 text-sm font-black transition-all duration-300 group/link rounded-xl"
+              <span 
+                className="relative px-5 py-2.5 text-sm font-black transition-all duration-300 group/link rounded-xl cursor-default"
                 style={{
                   color: isButcherTheme ? primaryColor : '#FFFFFF',
                   textShadow: isButcherTheme ? `0 0 8px ${primaryColor}40` : undefined,
                 }}
-                href="/leaderboard"
               >
                 Leaderboard
                 <span 
@@ -124,7 +123,7 @@ export function NewNavbar() {
                       : '0 0 8px #85C7FF',
                   }}
                 />
-              </a>
+              </span>
               
             </div>
           </div>
@@ -163,9 +162,14 @@ export function NewNavbar() {
               </svg>
               <div className="absolute inset-0 -translate-x-full group-hover/cta:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
             </a>
-            <Button className="px-5 py-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-semibold text-white transition-all duration-300">
+            <a
+              href="https://wager.com/?overlay=login"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 py-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-semibold text-white transition-all duration-300"
+            >
               Sign In
-            </Button>
+            </a>
           </div>
         </nav>
       </div>
@@ -214,14 +218,13 @@ export function NewNavbar() {
         <div className="fixed inset-0 z-40 bg-[#020305]/95 backdrop-blur-[20px] transition-all duration-500 ease-[cubic-bezier(0.32,0,0.67,0)] md:hidden">
           <div className="h-full flex flex-col justify-center items-center relative z-10 px-6">
             <div className="flex flex-col items-center gap-8">
-              <a
-                className="relative group text-4xl font-black uppercase tracking-tight text-white transition-all duration-500"
-                href="/leaderboard"
+              <span
+                className="relative group text-4xl font-black uppercase tracking-tight text-white transition-all duration-500 cursor-default"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <span className="relative z-10">Leaderboard</span>
                 <span className="absolute bottom-1 left-0 w-full h-[6px] bg-[#85C7FF] opacity-30 -skew-x-12 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
-              </a>
+              </span>
               <a
                 className="relative group text-4xl font-black uppercase tracking-tight text-white transition-all duration-500"
                 href="/bonuses"
@@ -230,9 +233,15 @@ export function NewNavbar() {
                 <span className="relative z-10">Bonuses</span>
                 <span className="absolute bottom-1 left-0 w-full h-[6px] bg-[#85C7FF] opacity-30 -skew-x-12 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
               </a>
-              <button className="relative group text-4xl font-black uppercase tracking-tight text-[#85C7FF] transition-all duration-500">
+              <a
+                href="https://wager.com/?overlay=login"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative group text-4xl font-black uppercase tracking-tight text-[#85C7FF] transition-all duration-500"
+                onClick={() => setMobileMenuOpen(false)}
+              >
                 Sign In
-              </button>
+              </a>
             </div>
             
             <div className="mt-16 w-full max-w-[280px] h-[1px] bg-white/10" />
