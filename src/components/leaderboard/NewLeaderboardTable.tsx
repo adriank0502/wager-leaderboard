@@ -1,5 +1,6 @@
 import { LeaderboardEntry } from '@/types/leaderboard';
 import { EmptyLeaderboard } from './EmptyLeaderboard';
+import { BRANDING } from '@/config/branding';
 
 interface NewLeaderboardTableProps {
   entries: LeaderboardEntry[];
@@ -10,6 +11,13 @@ export function NewLeaderboardTable({ entries, currentUser }: NewLeaderboardTabl
   if (entries.length === 0) {
     return <EmptyLeaderboard />;
   }
+  
+  const isButcherTheme = BRANDING.streamerCode === 'butcher';
+  const primaryColor = isButcherTheme ? BRANDING.theme.secondaryColor : '#85C7FF';
+  const bgColor = isButcherTheme ? '#1a0000' : '#0f1322';
+  const borderColor = isButcherTheme ? 'rgba(220, 20, 60, 0.2)' : 'rgba(82, 97, 151, 0.2)';
+  const headerBg = isButcherTheme ? 'rgba(26, 0, 0, 0.95)' : 'rgba(22, 27, 46, 0.95)';
+  const hoverBg = isButcherTheme ? 'rgba(220, 20, 60, 0.1)' : 'rgba(82, 97, 151, 0.05)';
   
   // Check if current user is in the displayed entries
   const isUserInList = (entry: LeaderboardEntry) => {
@@ -35,34 +43,109 @@ export function NewLeaderboardTable({ entries, currentUser }: NewLeaderboardTabl
   return (
     <section className="relative mx-auto mb-16 w-full max-w-5xl px-4">
       <div className="relative">
-        <div className="relative rounded-2xl overflow-hidden bg-[#0f1322] shadow-2xl ring-1 ring-[#526197]/20">
-          {/* Top highlight */}
-          <div className="absolute top-0 left-[10%] right-[10%] h-[1px] bg-gradient-to-r from-transparent via-[#526197]/60 to-transparent z-20" />
+        <div 
+          className="relative rounded-2xl overflow-hidden shadow-2xl ring-1"
+          style={{
+            background: bgColor,
+            boxShadow: isButcherTheme 
+              ? '0 20px 60px rgba(139, 0, 0, 0.4), 0 0 0 1px rgba(220, 20, 60, 0.2), inset 0 0 40px rgba(220, 20, 60, 0.05)'
+              : '0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(82, 97, 151, 0.2)',
+            border: isButcherTheme ? '1px solid rgba(220, 20, 60, 0.3)' : undefined,
+          }}
+        >
+          {/* Top highlight - blood dripping effect for butcher */}
+          <div 
+            className="absolute top-0 left-[10%] right-[10%] h-[2px] z-20"
+            style={{
+              background: isButcherTheme
+                ? `linear-gradient(to right, transparent, ${primaryColor}80, ${primaryColor}40, ${primaryColor}80, transparent)`
+                : 'linear-gradient(to right, transparent, rgba(82, 97, 151, 0.6), transparent)',
+              boxShadow: isButcherTheme ? `0 0 10px ${primaryColor}40` : undefined,
+            }}
+          />
           
           {/* Desktop Header */}
-          <div className="hidden sm:grid sticky top-0 z-30 grid-cols-[50px_2fr_1.2fr_1.2fr] gap-4 py-3.5 px-5 bg-[#161b2e]/95 backdrop-blur-sm border-b border-[#526197]/20">
-            <div className="text-[10px] font-bold text-[#E8E5FF]/60 uppercase tracking-widest">#</div>
-            <div className="text-[10px] font-bold text-[#E8E5FF]/60 uppercase tracking-widest">Player</div>
-            <div className="text-[10px] font-bold text-[#E8E5FF]/60 uppercase tracking-widest text-right">Prize</div>
-            <div className="text-[10px] font-bold text-[#E8E5FF]/60 uppercase tracking-widest text-right">Wagered</div>
+          <div 
+            className="hidden sm:grid sticky top-0 z-30 grid-cols-[50px_2fr_1.2fr_1.2fr] gap-4 py-3.5 px-5 backdrop-blur-sm border-b"
+            style={{
+              background: headerBg,
+              borderColor: borderColor,
+            }}
+          >
+            <div 
+              className="text-[10px] font-black uppercase tracking-widest"
+              style={{ color: isButcherTheme ? 'rgba(220, 20, 60, 0.9)' : 'rgba(232, 229, 255, 0.6)' }}
+            >
+              #
+            </div>
+            <div 
+              className="text-[10px] font-black uppercase tracking-widest"
+              style={{ color: isButcherTheme ? 'rgba(220, 20, 60, 0.9)' : 'rgba(232, 229, 255, 0.6)' }}
+            >
+              Player
+            </div>
+            <div 
+              className="text-[10px] font-black uppercase tracking-widest text-right"
+              style={{ color: isButcherTheme ? 'rgba(220, 20, 60, 0.9)' : 'rgba(232, 229, 255, 0.6)' }}
+            >
+              Prize
+            </div>
+            <div 
+              className="text-[10px] font-black uppercase tracking-widest text-right"
+              style={{ color: isButcherTheme ? 'rgba(220, 20, 60, 0.9)' : 'rgba(232, 229, 255, 0.6)' }}
+            >
+              Wagered
+            </div>
           </div>
           
           {/* Mobile Header */}
-          <div className="sm:hidden flex items-center justify-between py-3.5 px-4 bg-[#161b2e]/95 border-b border-[#526197]/20">
-            <span className="text-[11px] font-bold text-[#E8E5FF]/60 uppercase tracking-widest">Rankings</span>
-            <span className="text-[11px] font-bold text-[#E8E5FF]/60 uppercase tracking-widest">Prize</span>
+          <div 
+            className="sm:hidden flex items-center justify-between py-3.5 px-4 border-b"
+            style={{
+              background: headerBg,
+              borderColor: borderColor,
+            }}
+          >
+            <span 
+              className="text-[11px] font-black uppercase tracking-widest"
+              style={{ color: isButcherTheme ? 'rgba(220, 20, 60, 0.9)' : 'rgba(232, 229, 255, 0.6)' }}
+            >
+              Rankings
+            </span>
+            <span 
+              className="text-[11px] font-black uppercase tracking-widest"
+              style={{ color: isButcherTheme ? 'rgba(220, 20, 60, 0.9)' : 'rgba(232, 229, 255, 0.6)' }}
+            >
+              Prize
+            </span>
           </div>
           
           {/* Entries */}
           <div className="flex flex-col relative">
             {entries.map((entry) => (
-              <div key={entry.player.uuid} className={`group relative leaderboard-row ${isUserInList(entry) ? 'bg-[#85C7FF]/5' : ''}`}>
+              <div 
+                key={entry.player.uuid} 
+                className={`group relative leaderboard-row ${isButcherTheme ? 'butcher-theme' : ''} ${isUserInList(entry) ? isButcherTheme ? 'bg-[rgba(220,20,60,0.1)]' : 'bg-[#85C7FF]/5' : ''}`}
+              >
                 {/* Desktop Row */}
-                <div className="hidden sm:grid relative grid-cols-[50px_2fr_1.2fr_1.2fr] items-center gap-4 py-3.5 px-5 transition-all duration-200">
-                  <div className="absolute inset-0 bg-[#526197]/0 group-hover:bg-[#526197]/5 transition-colors duration-200" />
+                <div className="hidden sm:grid relative grid-cols-[50px_2fr_1.2fr_1.2fr] items-center gap-4 py-3.5 px-5 transition-all duration-200 group">
+                  <div 
+                    className="absolute inset-0 transition-all duration-200 row-bg"
+                    style={{
+                      background: 'transparent',
+                    }}
+                  />
                   
-                  {/* Hover indicator */}
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-0 bg-[#85C7FF] group-hover:h-6 transition-all duration-200 shadow-[0_0_8px_#85C7FF]" />
+                  {/* Hover indicator - blood red glow for butcher */}
+                  <div 
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-0 transition-all duration-200 group-hover:h-8"
+                    style={{
+                      background: primaryColor,
+                      boxShadow: isButcherTheme 
+                        ? `0 0 15px ${primaryColor}, 0 0 30px ${primaryColor}40`
+                        : `0 0 8px ${primaryColor}`,
+                    }}
+                  />
                   
                   {/* Rank */}
                   <div className="flex items-center relative z-10">
@@ -85,29 +168,65 @@ export function NewLeaderboardTable({ entries, currentUser }: NewLeaderboardTabl
                     <span className="truncate font-semibold text-sm transition-colors text-white">
                       {entry.player.username}
                       {isUserInList(entry) && (
-                        <span className="ml-2 text-xs text-[#85C7FF] font-bold">(You)</span>
+                        <span 
+                          className="ml-2 text-xs font-black"
+                          style={{
+                            color: primaryColor,
+                            textShadow: isButcherTheme ? `0 0 8px ${primaryColor}` : undefined,
+                          }}
+                        >
+                          (You)
+                        </span>
                       )}
                     </span>
                   </div>
                   
                   {/* Prize */}
                   <div className="flex justify-end relative z-10">
-                    <span className="text-sm font-bold tabular-nums transition-colors text-[#85C7FF] group-hover:text-[#A6D8FF] drop-shadow-[0_0_3px_rgba(133,199,255,0.2)]">
+                    <span 
+                      className="text-sm font-black tabular-nums transition-all duration-200"
+                      style={{
+                        color: primaryColor,
+                        textShadow: isButcherTheme 
+                          ? `0 0 10px ${primaryColor}60, 0 0 20px ${primaryColor}40`
+                          : `0 0 3px rgba(133,199,255,0.2)`,
+                      }}
+                      onMouseEnter={(e) => {
+                        if (isButcherTheme) {
+                          e.currentTarget.style.textShadow = `0 0 15px ${primaryColor}, 0 0 30px ${primaryColor}80`;
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (isButcherTheme) {
+                          e.currentTarget.style.textShadow = `0 0 10px ${primaryColor}60, 0 0 20px ${primaryColor}40`;
+                        }
+                      }}
+                    >
                       ${entry.prize.amount}
                     </span>
                   </div>
                   
                   {/* Wagered */}
                   <div className="text-right relative z-10">
-                    <span className="text-sm font-medium text-[#E8E5FF]/50 group-hover:text-[#E8E5FF]/70 transition-colors tabular-nums">
+                    <span 
+                      className="text-sm font-semibold transition-colors tabular-nums"
+                      style={{
+                        color: isButcherTheme ? 'rgba(255, 255, 255, 0.7)' : 'rgba(232, 229, 255, 0.5)',
+                      }}
+                    >
                       ${formatValue(entry.value)}
                     </span>
                   </div>
                 </div>
                 
                 {/* Mobile Row */}
-                <div className="sm:hidden relative flex items-center gap-3 py-3.5 px-4 transition-all duration-200">
-                  <div className="absolute inset-0 bg-[#526197]/0 group-hover:bg-[#526197]/5 transition-colors duration-200" />
+                <div className="sm:hidden relative flex items-center gap-3 py-3.5 px-4 transition-all duration-200 group">
+                  <div 
+                    className="absolute inset-0 transition-colors duration-200"
+                    style={{
+                      background: 'transparent',
+                    }}
+                  />
                   
                   {/* Rank */}
                   <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center relative z-10 bg-[#526197]/20">
@@ -142,8 +261,25 @@ export function NewLeaderboardTable({ entries, currentUser }: NewLeaderboardTabl
                   </div>
                 </div>
                 
-                {/* Bottom border */}
-                <div className="absolute bottom-0 left-3 sm:left-5 right-3 sm:right-5 h-[1px] bg-[#526197]/10 group-hover:bg-[#526197]/20 transition-colors" />
+                {/* Bottom border - blood effect for butcher */}
+                <div 
+                  className="absolute bottom-0 left-3 sm:left-5 right-3 sm:right-5 h-[1px] transition-colors"
+                  style={{
+                    background: isButcherTheme 
+                      ? 'linear-gradient(to right, transparent, rgba(220, 20, 60, 0.2), transparent)'
+                      : 'rgba(82, 97, 151, 0.1)',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (isButcherTheme) {
+                      e.currentTarget.style.background = 'linear-gradient(to right, transparent, rgba(220, 20, 60, 0.4), transparent)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (isButcherTheme) {
+                      e.currentTarget.style.background = 'linear-gradient(to right, transparent, rgba(220, 20, 60, 0.2), transparent)';
+                    }
+                  }}
+                />
               </div>
             ))}
           </div>

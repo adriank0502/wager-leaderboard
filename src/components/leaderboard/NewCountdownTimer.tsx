@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { BRANDING } from '@/config/branding';
 
 interface NewCountdownTimerProps {
   days?: number;
@@ -42,17 +43,51 @@ export function NewCountdownTimer({
     return () => clearInterval(interval);
   }, []);
 
+  const isButcherTheme = BRANDING.streamerCode === 'butcher';
+  const primaryColor = isButcherTheme ? BRANDING.theme.secondaryColor : '#85C7FF';
+  const bgColor = isButcherTheme ? '#1a0000' : '#1B1F38';
+  const borderGradient = isButcherTheme 
+    ? `linear-gradient(to bottom, ${BRANDING.theme.secondaryColor}50, ${BRANDING.theme.primaryColor}30)`
+    : 'linear-gradient(to bottom, rgba(133, 199, 255, 0.3), rgba(133, 199, 255, 0.1))';
+
   const formatNumber = (num: number) => num.toString().padStart(2, '0');
 
   const TimeBox = ({ value, label }: { value: number; label: string }) => (
     <div className="text-center min-w-[70px] sm:min-w-[90px]">
       <div className="relative mb-3">
-        <div className="relative rounded-xl p-[1px] bg-gradient-to-b from-[#85C7FF]/30 to-[#85C7FF]/10">
-          <div className="bg-[#1B1F38] rounded-xl px-4 py-3 sm:px-5 sm:py-4 timer-box">
+        <div 
+          className="relative rounded-xl p-[1px]"
+          style={{
+            background: borderGradient,
+            boxShadow: isButcherTheme 
+              ? `0 0 20px ${primaryColor}30, inset 0 0 20px ${primaryColor}10`
+              : undefined,
+          }}
+        >
+          <div 
+            className="rounded-xl px-4 py-3 sm:px-5 sm:py-4"
+            style={{
+              background: bgColor,
+              border: isButcherTheme ? `1px solid ${primaryColor}20` : undefined,
+            }}
+          >
             <div className="relative h-[40px] sm:h-[52px]">
               <div 
-                className="absolute inset-0 flex items-center justify-center text-3xl sm:text-4xl font-black text-gradient-white-blue"
-                style={{ opacity: 1, transform: 'none' }}
+                className="absolute inset-0 flex items-center justify-center text-3xl sm:text-4xl font-black"
+                style={{
+                  opacity: 1,
+                  transform: 'none',
+                  color: isButcherTheme ? primaryColor : '#FFFFFF',
+                  textShadow: isButcherTheme
+                    ? `0 0 20px ${primaryColor}80, 0 0 40px ${primaryColor}40, 0 0 60px ${primaryColor}20`
+                    : undefined,
+                  background: isButcherTheme 
+                    ? `linear-gradient(to bottom, ${primaryColor}, #FF6347, ${primaryColor})`
+                    : 'linear-gradient(to bottom, #FFFFFF, rgba(133, 199, 255, 0.9))',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
               >
                 {formatNumber(value)}
               </div>
@@ -60,14 +95,29 @@ export function NewCountdownTimer({
           </div>
         </div>
       </div>
-      <div className="text-[10px] sm:text-xs font-black text-[#7D7E97] uppercase tracking-wider">
+      <div 
+        className="text-[10px] sm:text-xs font-black uppercase tracking-wider"
+        style={{
+          color: isButcherTheme ? 'rgba(220, 20, 60, 0.8)' : '#7D7E97',
+          textShadow: isButcherTheme ? `0 0 5px ${primaryColor}40` : undefined,
+        }}
+      >
         {label}
       </div>
     </div>
   );
 
   const Separator = () => (
-    <div className="text-2xl sm:text-3xl font-black text-[#85C7FF]/30 -mt-6">:</div>
+    <div 
+      className="text-2xl sm:text-3xl font-black -mt-6"
+      style={{
+        color: isButcherTheme ? `${primaryColor}60` : 'rgba(133, 199, 255, 0.3)',
+        textShadow: isButcherTheme ? `0 0 10px ${primaryColor}40` : undefined,
+        animation: isButcherTheme ? 'bloodPulse 2s ease-in-out infinite' : undefined,
+      }}
+    >
+      :
+    </div>
   );
 
   return (
