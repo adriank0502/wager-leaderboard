@@ -1,5 +1,47 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { leaderboardCache } from './lib/cache.js';
+import { Redis } from '@upstash/redis';
+
+// Initialize Redis client
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL || '',
+  token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
+});
+
+interface CachedLeaderboard {
+  data: any;
+  timestamp: number;
+  tournamentId: string;
+}
+
+// Cache helper functions
+const CACHE_PREFIX = 'leaderboard:';
+
+async function getCache(tournamentId: string): Promise<CachedLeaderboard | null> {
+  const key = `${CACHE_PREFIX}${tournamentId}`;
+
+  try {
+    const cached = await redis.get<string>(key);
+    
+    if (!cached) {
+      return null;
+    }
+
+    return JSON.parse(cached) as CachedLeaderboard;
+  } catch (error) {
+    return null;
+  }
+}
+
+async function getTTL(tournamentId: string): Promise<number> {
+  const key = `${CACHE_PREFIX}${tournamentId}`;
+  
+  try {
+    const ttl = await redis.ttl(key);
+    return ttl;
+  } catch (error) {
+    return -1;
+  }
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Enable CORS
@@ -23,7 +65,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Get cached data
-    const cached = await leaderboardCache.get(tournamentId);
+    const cached = await getCache(tournamentId);
 
     if (!cached) {
       return res.status(404).json({
@@ -33,7 +75,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Get remaining TTL from Redis
-    const ttl = await leaderboardCache.getTTL(tournamentId);
+    const ttl = await getTTL(tournamentId);
     const cacheAge = Date.now() - cached.timestamp;
     const isStale = ttl < 60; // Consider stale if less than 1 minute remaining
 
