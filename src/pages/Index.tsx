@@ -56,7 +56,7 @@ const Index = () => {
       <div className="relative z-10 pb-20">
         {/* Hero Section */}
         <NewPrizeHero 
-          prizeAmount="$40,000" 
+          prizeAmount="$5,000" 
           period="Monthly"
           description={BRANDING.customText?.heroDescription || `Sign up using referral code ${BRANDING.customText?.referralCode || BRANDING.streamerName} and start wagering to compete for prizes`}
           streamerName={BRANDING.streamerName}

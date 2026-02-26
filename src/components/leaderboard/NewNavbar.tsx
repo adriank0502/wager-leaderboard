@@ -77,7 +77,7 @@ export function NewNavbar() {
                   }}
                 >
                   <img 
-                    src="/favicon.png" 
+                    src="https://files.kick.com/images/user/5981471/profile_image/conversion/640ca56b-f73c-4fd7-94a6-b36bdc586a4d-fullsize.webp" 
                     alt={`${BRANDING.streamerName} Logo`}
                     className="object-cover opacity-90 group-hover/logo:opacity-100 group-hover/logo:scale-110 transition-all duration-300 w-full h-full"
                   />
@@ -184,7 +184,7 @@ export function NewNavbar() {
             >
               <a className="block w-8 h-8 rounded-full overflow-hidden" href="/">
                 <img 
-                  src="/favicon.png" 
+                  src="https://files.kick.com/images/user/5981471/profile_image/conversion/640ca56b-f73c-4fd7-94a6-b36bdc586a4d-fullsize.webp" 
                   alt={`${BRANDING.streamerName} Logo`}
                   className="object-cover w-full h-full" 
                 />

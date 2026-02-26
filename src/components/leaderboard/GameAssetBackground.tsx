@@ -24,52 +24,6 @@ export function GameAssetBackground() {
         }}
       />
       
-      {/* No Limit City Game Images Background - Smooth animated overlay */}
-      {gameImages.length > 0 && (
-        <div className="fixed inset-0 -z-10 overflow-hidden">
-          {/* Multiple game images with smooth crossfade transitions */}
-          {gameImages.map((imageUrl, index) => {
-            // Each image cycle: 15 seconds, so 3 images = 45 seconds total cycle
-            const totalDuration = 45;
-            const delay = index * 15;
-            
-            return (
-              <div
-                key={`game-bg-${index}`}
-                className="absolute inset-0"
-                style={{
-                  backgroundImage: `url(${imageUrl})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  backgroundRepeat: 'no-repeat',
-                  animation: `gameImageFade ${totalDuration}s ease-in-out infinite`,
-                  animationDelay: `${delay}s`,
-                  filter: 'blur(0.5px) brightness(0.6) contrast(1.5) saturate(1.4)',
-                  mixBlendMode: 'screen',
-                  opacity: 0,
-                  willChange: 'opacity, transform',
-                }}
-              />
-            );
-          })}
-          
-          {/* Additional overlay for depth and blood theme - lighter so images show through */}
-          <div 
-            className="absolute inset-0"
-            style={{
-              background: 'radial-gradient(ellipse at center, transparent 0%, rgba(26, 0, 0, 0.2) 50%, rgba(26, 0, 0, 0.5) 75%, rgba(26, 0, 0, 0.75) 100%)',
-            }}
-          />
-          
-          {/* Blood red tint overlay - lighter */}
-          <div 
-            className="absolute inset-0 opacity-25"
-            style={{
-              background: 'linear-gradient(to bottom, rgba(220, 20, 60, 0.06) 0%, transparent 50%, rgba(139, 0, 0, 0.1) 100%)',
-            }}
-          />
-        </div>
-      )}
       
       {/* Additional red overlay for more blood-like appearance */}
       <div 
