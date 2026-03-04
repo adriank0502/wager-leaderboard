@@ -19,9 +19,9 @@ export function PeriodToggle({ onChange }: PeriodToggleProps) {
   };
 
   return (
-    <div className="flex justify-center mb-10">
+    <div className="flex justify-center mb-6 sm:mb-10">
       <div 
-        className="relative inline-flex p-1 rounded-full toggle-switch"
+        className="relative inline-flex p-0.5 sm:p-1 rounded-full toggle-switch"
         style={{
           background: bgColor,
           border: `1px solid ${borderColor}`,
@@ -31,8 +31,8 @@ export function PeriodToggle({ onChange }: PeriodToggleProps) {
         }}
       >
         <div 
-          className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-full transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] toggle-indicator ${
-            selected === 'monthly' ? 'left-1' : 'left-[calc(50%+2px)]'
+          className={`absolute top-0.5 sm:top-1 bottom-0.5 sm:bottom-1 w-[calc(50%-2px)] sm:w-[calc(50%-4px)] rounded-full transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] toggle-indicator ${
+            selected === 'monthly' ? 'left-0.5 sm:left-1' : 'left-[calc(50%+1px)] sm:left-[calc(50%+2px)]'
           }`}
           style={{
             background: `linear-gradient(to right, ${primaryColor}, ${accentColor})`,
@@ -43,7 +43,7 @@ export function PeriodToggle({ onChange }: PeriodToggleProps) {
         />
         <button 
           onClick={() => handleToggle('monthly')}
-          className={`relative z-10 px-7 py-2.5 rounded-full text-sm font-black transition-all duration-300 ${
+          className={`relative z-10 px-5 sm:px-7 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-black transition-all duration-300 ${
             selected === 'monthly' ? 'text-white' : isButcherTheme ? 'text-white/60 hover:text-white/80' : 'text-white/50 hover:text-white/70'
           }`}
           style={{
@@ -54,7 +54,7 @@ export function PeriodToggle({ onChange }: PeriodToggleProps) {
         </button>
         <button 
           onClick={() => handleToggle('weekly')}
-          className={`relative z-10 px-7 py-2.5 rounded-full text-sm font-black transition-all duration-300 ${
+          className={`relative z-10 px-5 sm:px-7 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-black transition-all duration-300 ${
             selected === 'weekly' ? 'text-white' : isButcherTheme ? 'text-white/60 hover:text-white/80' : 'text-white/50 hover:text-white/70'
           }`}
           style={{
