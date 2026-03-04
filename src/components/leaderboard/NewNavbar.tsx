@@ -176,17 +176,17 @@ export function NewNavbar() {
       
       {/* Mobile Navigation */}
       <nav className="fixed md:hidden top-0 left-0 right-0 z-50 pointer-events-none">
-        <div className="p-4 flex justify-between items-start">
+        <div className="p-3 flex justify-between items-start">
           <div className="pointer-events-auto transition-all duration-500 opacity-100 scale-100 blur-0">
             <div 
-              className="p-2 backdrop-blur-md border rounded-full shadow-lg"
+              className="p-1.5 backdrop-blur-md border rounded-full shadow-lg"
               style={{
                 background: isButcherTheme ? 'rgba(26, 0, 0, 0.8)' : 'rgba(11, 16, 27, 0.8)',
                 borderColor: isButcherTheme ? `${primaryColor}30` : 'rgba(255, 255, 255, 0.1)',
                 boxShadow: isButcherTheme ? `0 4px 15px rgba(139, 0, 0, 0.3), 0 0 20px ${primaryColor}20` : undefined,
               }}
             >
-              <a className="block w-8 h-8 rounded-full overflow-hidden" href="/">
+              <a className="block w-7 h-7 rounded-full overflow-hidden" href="/">
                 <img 
                   src="https://files.kick.com/images/user/5981471/profile_image/conversion/640ca56b-f73c-4fd7-94a6-b36bdc586a4d-fullsize.webp" 
                   alt={`${BRANDING.streamerName} Logo`}
@@ -198,15 +198,15 @@ export function NewNavbar() {
           
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="pointer-events-auto relative group w-12 h-12 flex flex-col justify-center items-center gap-[5px] rounded-full backdrop-blur-md transition-all duration-300 bg-[#0b101b]/80 border border-white/10 shadow-lg"
+            className="pointer-events-auto relative group w-10 h-10 flex flex-col justify-center items-center gap-[4px] rounded-full backdrop-blur-md transition-all duration-300 bg-[#0b101b]/80 border border-white/10 shadow-lg"
           >
             {mobileMenuOpen ? (
-              <X className="w-5 h-5 text-white" />
+              <X className="w-4 h-4 text-white" />
             ) : (
               <>
-                <span className="h-[2px] bg-white rounded-full transition-all duration-300 w-5 group-hover:w-6" />
-                <span className="h-[2px] bg-white rounded-full transition-all duration-300 w-3 opacity-60 group-hover:w-6 group-hover:opacity-100" />
-                <span className="h-[2px] bg-white rounded-full transition-all duration-300 w-4 group-hover:w-6" />
+                <span className="h-[2px] bg-white rounded-full transition-all duration-300 w-4 group-hover:w-5" />
+                <span className="h-[2px] bg-white rounded-full transition-all duration-300 w-2.5 opacity-60 group-hover:w-5 group-hover:opacity-100" />
+                <span className="h-[2px] bg-white rounded-full transition-all duration-300 w-3.5 group-hover:w-5" />
               </>
             )}
           </button>

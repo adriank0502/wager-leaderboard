@@ -28,7 +28,7 @@ export function NewPodiumSection({ topThree }: NewPodiumSectionProps) {
   };
 
   return (
-    <div className="w-full my-14 px-4 min-h-[350px] md:min-h-[380px]">
+    <div className="w-full my-8 md:my-14 px-3 md:px-4 min-h-[280px] md:min-h-[380px]">
       {/* Desktop Podium */}
       <div className="hidden md:flex items-end justify-center gap-3 sm:gap-4 max-w-4xl mx-auto h-[305px]">
         {/* Second Place */}
@@ -42,7 +42,7 @@ export function NewPodiumSection({ topThree }: NewPodiumSectionProps) {
       </div>
       
       {/* Mobile Podium */}
-      <div className="md:hidden flex items-end justify-center gap-2 max-w-lg mx-auto h-[210px]">
+      <div className="md:hidden flex items-end justify-center gap-1.5 max-w-lg mx-auto h-[180px]">
         <PodiumCardMobile entry={second} position="second" getInitials={getInitials} formatValue={formatValue} />
         <PodiumCardMobile entry={first} position="first" getInitials={getInitials} formatValue={formatValue} />
         <PodiumCardMobile entry={third} position="third" getInitials={getInitials} formatValue={formatValue} />
@@ -199,14 +199,14 @@ function PodiumCard({ entry, position, getInitials, formatValue }: PodiumCardPro
           </div>
           
           {/* Username */}
-          <h3 className={`mt-4 text-sm font-black ${isFirst ? 'text-[15px] text-white' : 'text-[#E8E5FF]'} truncate max-w-[95%]`}>
+          <h3 className={`mt-3 text-xs font-black ${isFirst ? 'text-sm text-white' : 'text-[#E8E5FF]'} truncate max-w-[95%]`}>
             {entry.player.username}
           </h3>
           
           {/* Prize and wagered amount - blood red */}
           <div className="mt-auto w-full">
             <div 
-              className="relative rounded-xl py-4 px-4"
+              className="relative rounded-lg py-2.5 px-3"
               style={{
                 background: isFirst
                   ? isButcherTheme ? `${primaryColor}15` : 'rgba(133, 199, 255, 0.06)'
@@ -217,7 +217,7 @@ function PodiumCard({ entry, position, getInitials, formatValue }: PodiumCardPro
             >
               <div className="text-center">
                 <span 
-                  className={`${c.prizeSize} font-black tabular-nums tracking-tight leading-none`}
+                  className={`${isFirst ? 'text-xl' : 'text-lg'} font-black tabular-nums tracking-tight leading-none`}
                   style={{
                     color: isFirst ? primaryColor : isButcherTheme ? primaryColor : '#E8E5FF',
                     background: isFirst && isButcherTheme
@@ -235,11 +235,11 @@ function PodiumCard({ entry, position, getInitials, formatValue }: PodiumCardPro
                 </span>
               </div>
             </div>
-            <div className="mt-3.5 px-1 flex flex-col items-center text-center">
-              <span className={`text-[10px] font-bold uppercase tracking-wider ${
+            <div className="mt-2.5 px-1 flex flex-col items-center text-center">
+              <span className={`text-[9px] font-bold uppercase tracking-wider ${
                 isFirst ? 'text-white/40' : 'text-[#E8E5FF]/45'
               }`}>Wagered</span>
-              <span className={`text-[13px] font-bold tabular-nums ${
+              <span className={`text-[11px] font-bold tabular-nums ${
                 isFirst ? 'text-white/55' : 'text-[#E8E5FF]/55'
               }`}>${formatValue(entry.value)}</span>
             </div>
@@ -263,7 +263,7 @@ function PodiumCardMobile({ entry, position, getInitials, formatValue }: PodiumC
     : 'linear-gradient(to bottom, #1a1d2e, #141829, #0e1220)';
 
   const isFirst = position === 'first';
-  const height = isFirst ? 'h-[210px]' : 'h-[185px] mt-5';
+  const height = isFirst ? 'h-[180px]' : 'h-[160px] mt-4';
 
   return (
     <div className={`group relative flex-1 ${height} ${isFirst ? 'z-10' : 'z-0'}`}>
@@ -314,9 +314,9 @@ function PodiumCardMobile({ entry, position, getInitials, formatValue }: PodiumC
           }}
         />
         
-        <div className="relative h-full flex flex-col items-center px-2.5 pt-4 pb-3">
+        <div className="relative h-full flex flex-col items-center px-2 pt-3 pb-2.5">
           <div 
-            className="absolute top-2.5 right-2.5 w-6 h-6 rounded-md flex items-center justify-center"
+            className="absolute top-2 right-2 w-5 h-5 rounded-md flex items-center justify-center"
             style={{
               background: isFirst
                 ? isButcherTheme ? `${primaryColor}20` : 'rgba(133, 199, 255, 0.1)'
@@ -326,7 +326,7 @@ function PodiumCardMobile({ entry, position, getInitials, formatValue }: PodiumC
             }}
           >
             <span 
-              className="text-[10px] font-black"
+              className="text-[9px] font-black"
               style={{
                 color: isFirst ? primaryColor : isButcherTheme ? `${primaryColor}90` : 'rgba(232, 229, 255, 0.7)',
                 textShadow: isButcherTheme ? `0 0 8px ${primaryColor}60` : undefined,
@@ -338,7 +338,7 @@ function PodiumCardMobile({ entry, position, getInitials, formatValue }: PodiumC
           
           <div className="relative">
             <div 
-              className="relative rounded-full p-[2px]"
+              className="relative rounded-full p-[1.5px]"
               style={{
                 background: isFirst
                   ? isButcherTheme
@@ -351,13 +351,13 @@ function PodiumCardMobile({ entry, position, getInitials, formatValue }: PodiumC
               }}
             >
               <div 
-                className={`${isFirst ? 'w-14 h-14' : 'w-12 h-12'} rounded-full flex items-center justify-center`}
+                className={`${isFirst ? 'w-12 h-12' : 'w-10 h-10'} rounded-full flex items-center justify-center`}
                 style={{
                   background: isButcherTheme ? '#0f0000' : '#0c0f18',
                 }}
               >
                 <span 
-                  className={`${isFirst ? 'text-base' : 'text-sm'} font-black uppercase`}
+                  className={`${isFirst ? 'text-sm' : 'text-xs'} font-black uppercase`}
                   style={{
                     color: isFirst ? '#FFFFFF' : isButcherTheme ? `${primaryColor}90` : 'rgba(232, 229, 255, 0.9)',
                     textShadow: isButcherTheme ? `0 0 10px ${primaryColor}60` : undefined,
@@ -370,7 +370,7 @@ function PodiumCardMobile({ entry, position, getInitials, formatValue }: PodiumC
           </div>
           
           <h3 
-            className={`mt-2.5 text-[13px] font-black ${isFirst ? 'text-[14px]' : ''} truncate max-w-[95%]`}
+            className={`mt-1.5 text-[10px] font-black ${isFirst ? 'text-[11px]' : ''} truncate max-w-[95%]`}
             style={{
               color: isFirst ? '#FFFFFF' : isButcherTheme ? primaryColor : '#E8E5FF',
               textShadow: isButcherTheme ? `0 0 8px ${primaryColor}40` : undefined,
@@ -379,9 +379,9 @@ function PodiumCardMobile({ entry, position, getInitials, formatValue }: PodiumC
             {entry.player.username}
           </h3>
           
-          <div className="mt-auto w-full px-1">
+          <div className="mt-auto w-full px-0.5">
             <div 
-              className="relative rounded-xl py-2.5 px-2"
+              className="relative rounded-lg py-1.5 px-1"
               style={{
                 background: isFirst
                   ? isButcherTheme ? `${primaryColor}15` : 'rgba(133, 199, 255, 0.06)'
@@ -392,7 +392,7 @@ function PodiumCardMobile({ entry, position, getInitials, formatValue }: PodiumC
             >
               <div className="text-center">
                 <span 
-                  className={`${isFirst ? 'text-lg' : 'text-base'} font-black tabular-nums tracking-tight leading-none`}
+                  className={`${isFirst ? 'text-sm' : 'text-xs'} font-black tabular-nums tracking-tight leading-none`}
                   style={{
                     color: isFirst ? primaryColor : isButcherTheme ? primaryColor : '#E8E5FF',
                     background: isFirst && isButcherTheme
@@ -406,15 +406,15 @@ function PodiumCardMobile({ entry, position, getInitials, formatValue }: PodiumC
                     textShadow: isButcherTheme ? `0 0 20px ${primaryColor}80, 0 0 40px ${primaryColor}40` : undefined,
                   }}
                 >
-                  {formatValue(entry.prize.amount)}K
+                  ${entry.prize.amount}
                 </span>
               </div>
             </div>
-            <div className="mt-2 px-0.5 flex flex-col items-center text-center">
-              <span className={`text-[9px] font-bold uppercase tracking-wider ${
+            <div className="mt-1 px-0.5 flex flex-col items-center text-center">
+              <span className={`text-[7px] font-bold uppercase tracking-wider ${
                 isFirst ? 'text-white/40' : 'text-[#E8E5FF]/45'
               }`}>Wagered</span>
-              <span className={`text-[11px] font-bold tabular-nums ${
+              <span className={`text-[9px] font-bold tabular-nums ${
                 isFirst ? 'text-white/55' : 'text-[#E8E5FF]/55'
               }`}>{formatValue(entry.value)}</span>
             </div>

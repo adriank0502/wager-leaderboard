@@ -100,20 +100,20 @@ export function NewLeaderboardTable({ entries, currentUser }: NewLeaderboardTabl
           
           {/* Mobile Header */}
           <div 
-            className="sm:hidden flex items-center justify-between py-3.5 px-4 border-b"
+            className="sm:hidden flex items-center justify-between py-2.5 px-3 border-b"
             style={{
               background: headerBg,
               borderColor: borderColor,
             }}
           >
             <span 
-              className="text-[11px] font-black uppercase tracking-widest"
+              className="text-[10px] font-black uppercase tracking-widest"
               style={{ color: isButcherTheme ? 'rgba(220, 20, 60, 0.9)' : 'rgba(232, 229, 255, 0.6)' }}
             >
               Rankings
             </span>
             <span 
-              className="text-[11px] font-black uppercase tracking-widest"
+              className="text-[10px] font-black uppercase tracking-widest"
               style={{ color: isButcherTheme ? 'rgba(220, 20, 60, 0.9)' : 'rgba(232, 229, 255, 0.6)' }}
             >
               Prize
@@ -155,16 +155,7 @@ export function NewLeaderboardTable({ entries, currentUser }: NewLeaderboardTabl
                   </div>
                   
                   {/* Player */}
-                  <div className="flex items-center gap-3 overflow-hidden relative z-10">
-                    <div className="relative h-8 w-8 flex-shrink-0 rounded-full overflow-hidden select-none">
-                      <div className="absolute inset-0 bg-[#526197]/20" />
-                      <div className="absolute inset-0 rounded-full border transition-colors duration-300 border-[#526197]/50 group-hover:border-[#85C7FF]/50" />
-                      <div className="relative h-full w-full flex items-center justify-center">
-                        <span className="text-[10px] font-bold uppercase transition-colors text-white">
-                          {getInitials(entry.player.username)}
-                        </span>
-                      </div>
-                    </div>
+                  <div className="flex items-center overflow-hidden relative z-10">
                     <span className="truncate font-semibold text-sm transition-colors text-white">
                       {entry.player.username}
                       {isUserInList(entry) && (
@@ -220,7 +211,7 @@ export function NewLeaderboardTable({ entries, currentUser }: NewLeaderboardTabl
                 </div>
                 
                 {/* Mobile Row */}
-                <div className="sm:hidden relative flex items-center gap-3 py-3.5 px-4 transition-all duration-200 group">
+                <div className="sm:hidden relative flex items-center gap-2 py-2.5 px-3 transition-all duration-200 group">
                   <div 
                     className="absolute inset-0 transition-colors duration-200"
                     style={{
@@ -229,33 +220,40 @@ export function NewLeaderboardTable({ entries, currentUser }: NewLeaderboardTabl
                   />
                   
                   {/* Rank */}
-                  <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center relative z-10 bg-[#526197]/20">
-                    <span className="text-sm font-bold tabular-nums text-white">{entry.rank}</span>
-                  </div>
-                  
-                  {/* Avatar */}
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center border relative z-10 border-[#526197]/40 bg-[#526197]/15">
-                    <span className="text-[10px] font-bold uppercase text-white">
-                      {getInitials(entry.player.username)}
-                    </span>
+                  <div className="flex-shrink-0 w-7 h-7 rounded-md flex items-center justify-center relative z-10 bg-[#526197]/20">
+                    <span className="text-xs font-bold tabular-nums text-white">{entry.rank}</span>
                   </div>
                   
                   {/* Player info */}
                   <div className="flex-1 min-w-0 relative z-10">
-                    <span className="block truncate font-semibold text-sm text-white">
+                    <span className="block truncate font-semibold text-xs text-white">
                       {entry.player.username}
                       {isUserInList(entry) && (
-                        <span className="ml-1 text-xs text-[#85C7FF] font-bold">(You)</span>
+                        <span 
+                          className="ml-1 text-[10px] font-bold"
+                          style={{
+                            color: primaryColor,
+                            textShadow: isButcherTheme ? `0 0 8px ${primaryColor}60` : undefined,
+                          }}
+                        >
+                          (You)
+                        </span>
                       )}
                     </span>
-                    <span className="text-[11px] text-[#E8E5FF]/50 font-medium tabular-nums">
-                      ${formatValue(entry.value)} wagered
+                    <span className="text-[10px] text-[#E8E5FF]/50 font-medium tabular-nums">
+                      ${formatValue(entry.value)}
                     </span>
                   </div>
                   
                   {/* Prize */}
                   <div className="flex-shrink-0 text-right relative z-10">
-                    <span className="text-base font-bold tabular-nums text-[#85C7FF]">
+                    <span 
+                      className="text-sm font-bold tabular-nums"
+                      style={{
+                        color: primaryColor,
+                        textShadow: isButcherTheme ? `0 0 8px ${primaryColor}60` : undefined,
+                      }}
+                    >
                       ${formatValue(entry.prize.amount)}
                     </span>
                   </div>
@@ -263,7 +261,7 @@ export function NewLeaderboardTable({ entries, currentUser }: NewLeaderboardTabl
                 
                 {/* Bottom border - blood effect for butcher */}
                 <div 
-                  className="absolute bottom-0 left-3 sm:left-5 right-3 sm:right-5 h-[1px] transition-colors"
+                  className="absolute bottom-0 left-2 sm:left-5 right-2 sm:right-5 h-[1px] transition-colors"
                   style={{
                     background: isButcherTheme 
                       ? 'linear-gradient(to right, transparent, rgba(220, 20, 60, 0.2), transparent)'

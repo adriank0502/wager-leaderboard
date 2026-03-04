@@ -17,12 +17,12 @@ export function NewPrizeHero({
   const bloodRed = isButcherTheme ? BRANDING.theme.secondaryColor : '#DC143C';
   const bloodAccent = isButcherTheme ? BRANDING.theme.accentColor : '#FF6347';
   return (
-    <section className="relative mx-auto max-w-6xl px-4 pt-32 pb-16 sm:pt-36 sm:pb-20 text-center">
-      <div className="relative space-y-8">
+    <section className="relative mx-auto max-w-6xl px-4 pt-24 pb-12 sm:pt-32 sm:pb-16 md:pt-36 md:pb-20 text-center">
+      <div className="relative space-y-5 sm:space-y-8">
         {/* Large prize amount */}
-        <div className="relative px-4">
-          <h1 className="text-7xl sm:text-8xl md:text-9xl font-black tracking-tighter relative min-h-[1.1em]">
-            <span className="prize-amount inline-block min-w-[200px] sm:min-w-[280px] md:min-w-[360px]">
+        <div className="relative px-2 sm:px-4">
+          <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter relative min-h-[1.1em]">
+            <span className="prize-amount inline-block min-w-[160px] sm:min-w-[200px] md:min-w-[280px] lg:min-w-[360px]">
               {prizeAmount}
             </span>
           </h1>
@@ -30,12 +30,12 @@ export function NewPrizeHero({
         </div>
         
         {/* Period title */}
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white uppercase tracking-wider min-h-[1.2em]">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white uppercase tracking-wider min-h-[1.2em]">
           {period} Leaderboard
         </h2>
         
         {/* Description */}
-        <p className="mx-auto max-w-2xl text-base sm:text-lg text-white/60 font-semibold leading-relaxed">
+        <p className="mx-auto max-w-2xl text-sm sm:text-base md:text-lg text-white/60 font-semibold leading-relaxed px-2">
           {description.split(streamerName).map((part, i, arr) => (
             <span key={i}>
               {part}
@@ -48,10 +48,10 @@ export function NewPrizeHero({
         
         {/* ButcherX branding */}
         {isButcherTheme && (
-          <div className="flex items-center justify-center pt-6">
+          <div className="flex items-center justify-center pt-4 sm:pt-6">
             <div className="relative">
               <h2 
-                className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tight relative"
+                className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight relative"
                 style={{
                   background: `linear-gradient(to bottom right, ${bloodRed}, ${bloodAccent}, ${bloodRed})`,
                   WebkitBackgroundClip: 'text',
