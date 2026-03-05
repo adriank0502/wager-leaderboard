@@ -53,10 +53,10 @@ export function NewCountdownTimer({
   const formatNumber = (num: number) => num.toString().padStart(2, '0');
 
   const TimeBox = ({ value, label }: { value: number; label: string }) => (
-    <div className="text-center min-w-[70px] sm:min-w-[90px]">
-      <div className="relative mb-3">
+    <div className="text-center min-w-[60px] sm:min-w-[80px] md:min-w-[90px] flex-shrink-0">
+      <div className="relative mb-2 sm:mb-3">
         <div 
-          className="relative rounded-xl p-[1px]"
+          className="relative rounded-lg sm:rounded-xl p-[1px]"
           style={{
             background: borderGradient,
             boxShadow: isButcherTheme 
@@ -65,15 +65,15 @@ export function NewCountdownTimer({
           }}
         >
           <div 
-            className="rounded-xl px-4 py-3 sm:px-5 sm:py-4"
+            className="rounded-lg sm:rounded-xl px-2.5 py-2 sm:px-4 sm:py-3 md:px-5 md:py-4"
             style={{
               background: bgColor,
               border: isButcherTheme ? `1px solid ${primaryColor}20` : undefined,
             }}
           >
-            <div className="relative h-[40px] sm:h-[52px]">
+            <div className="relative min-h-[36px] h-[36px] sm:min-h-[44px] sm:h-[44px] md:min-h-[52px] md:h-[52px] flex items-center justify-center overflow-hidden">
               <div 
-                className="absolute inset-0 flex items-center justify-center text-3xl sm:text-4xl font-black"
+                className="flex items-center justify-center text-2xl sm:text-3xl md:text-4xl font-black leading-none"
                 style={{
                   opacity: 1,
                   transform: 'none',
@@ -87,6 +87,8 @@ export function NewCountdownTimer({
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
+                  wordBreak: 'keep-all',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 {formatNumber(value)}
@@ -96,7 +98,7 @@ export function NewCountdownTimer({
         </div>
       </div>
       <div 
-        className="text-[10px] sm:text-xs font-black uppercase tracking-wider"
+        className="text-[9px] sm:text-[10px] md:text-xs font-black uppercase tracking-wider"
         style={{
           color: isButcherTheme ? 'rgba(220, 20, 60, 0.8)' : '#7D7E97',
           textShadow: isButcherTheme ? `0 0 5px ${primaryColor}40` : undefined,
@@ -109,7 +111,7 @@ export function NewCountdownTimer({
 
   const Separator = () => (
     <div 
-      className="text-2xl sm:text-3xl font-black -mt-6"
+      className="text-xl sm:text-2xl md:text-3xl font-black -mt-4 sm:-mt-5 md:-mt-6 flex-shrink-0"
       style={{
         color: isButcherTheme ? `${primaryColor}60` : 'rgba(133, 199, 255, 0.3)',
         textShadow: isButcherTheme ? `0 0 10px ${primaryColor}40` : undefined,
@@ -121,21 +123,21 @@ export function NewCountdownTimer({
   );
 
   return (
-    <div className="relative mx-auto mb-10 max-w-4xl px-4">
-      <div className="flex items-center justify-center gap-4 sm:gap-8">
-        <div className="flex items-center gap-4 sm:gap-8">
+    <div className="relative mx-auto mb-8 sm:mb-10 max-w-4xl px-2 sm:px-4">
+      <div className="flex items-center justify-center gap-2 sm:gap-4 md:gap-6 lg:gap-8 flex-wrap">
+        <div className="flex items-center gap-2 sm:gap-4 md:gap-6 lg:gap-8">
           <TimeBox value={time.days} label="Days" />
           <Separator />
         </div>
-        <div className="flex items-center gap-4 sm:gap-8">
+        <div className="flex items-center gap-2 sm:gap-4 md:gap-6 lg:gap-8">
           <TimeBox value={time.hours} label="Hours" />
           <Separator />
         </div>
-        <div className="flex items-center gap-4 sm:gap-8">
+        <div className="flex items-center gap-2 sm:gap-4 md:gap-6 lg:gap-8">
           <TimeBox value={time.minutes} label="Minutes" />
           <Separator />
         </div>
-        <div className="flex items-center gap-4 sm:gap-8">
+        <div className="flex items-center gap-2 sm:gap-4 md:gap-6 lg:gap-8">
           <TimeBox value={time.seconds} label="Seconds" />
         </div>
       </div>
