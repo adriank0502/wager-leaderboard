@@ -1,6 +1,7 @@
 import { LeaderboardEntry } from '@/types/leaderboard';
 import { EmptyLeaderboard } from './EmptyLeaderboard';
 import { BRANDING } from '@/config/branding';
+import { getHardcodedPrize } from '@/utils/prizes';
 
 interface NewLeaderboardTableProps {
   entries: LeaderboardEntry[];
@@ -193,7 +194,7 @@ export function NewLeaderboardTable({ entries, currentUser }: NewLeaderboardTabl
                         }
                       }}
                     >
-                      ${entry.prize.amount}
+                      ${getHardcodedPrize(entry.rank)}
                     </span>
                   </div>
                   
@@ -254,7 +255,7 @@ export function NewLeaderboardTable({ entries, currentUser }: NewLeaderboardTabl
                         textShadow: isButcherTheme ? `0 0 8px ${primaryColor}60` : undefined,
                       }}
                     >
-                      ${formatValue(entry.prize.amount)}
+                      ${getHardcodedPrize(entry.rank)}
                     </span>
                   </div>
                 </div>
