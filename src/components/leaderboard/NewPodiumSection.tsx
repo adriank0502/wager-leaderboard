@@ -1,5 +1,6 @@
 import { LeaderboardEntry } from '@/types/leaderboard';
 import { BRANDING } from '@/config/branding';
+import { getHardcodedPrize } from '@/utils/prizes';
 
 interface NewPodiumSectionProps {
   topThree: LeaderboardEntry[];
@@ -231,7 +232,7 @@ function PodiumCard({ entry, position, getInitials, formatValue }: PodiumCardPro
                     textShadow: isButcherTheme ? `0 0 20px ${primaryColor}80, 0 0 40px ${primaryColor}40` : undefined,
                   }}
                 >
-                  ${entry.prize.amount}
+                  ${getHardcodedPrize(entry.rank)}
                 </span>
               </div>
             </div>
@@ -406,7 +407,7 @@ function PodiumCardMobile({ entry, position, getInitials, formatValue }: PodiumC
                     textShadow: isButcherTheme ? `0 0 20px ${primaryColor}80, 0 0 40px ${primaryColor}40` : undefined,
                   }}
                 >
-                  ${entry.prize.amount}
+                  ${getHardcodedPrize(entry.rank)}
                 </span>
               </div>
             </div>
