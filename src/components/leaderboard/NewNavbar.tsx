@@ -7,6 +7,10 @@ export function NewNavbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isButcherTheme = BRANDING.streamerCode === 'butcher';
   const primaryColor = isButcherTheme ? BRANDING.theme.secondaryColor : '#85C7FF';
+  const referralCode = BRANDING.customText?.referralCode || BRANDING.streamerName;
+  const signupUrl = isButcherTheme 
+    ? `https://wager.com/signup/?raf=${referralCode}` 
+    : "https://wager.com";
   const bgGradient = isButcherTheme
     ? `linear-gradient(135deg, ${BRANDING.theme.secondaryColor}15 0%, rgba(26, 0, 0, 0.5) 50%, ${BRANDING.theme.primaryColor}10 100%)`
     : 'linear-gradient(135deg, rgba(133, 199, 255, 0.05) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(153, 208, 255, 0.05) 100%)';
@@ -154,21 +158,13 @@ export function NewNavbar() {
                   e.currentTarget.style.transform = 'scale(1)';
                 }
               }}
-              href="https://wager.com"
+              href={signupUrl}
             >
               <span className="text-xs font-black uppercase tracking-widest text-white z-10">Play Now</span>
               <svg className="w-3.5 h-3.5 text-white transition-transform group-hover/cta:translate-x-0.5 z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
               <div className="absolute inset-0 -translate-x-full group-hover/cta:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-            </a>
-            <a
-              href="https://wager.com/?overlay=login"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-5 py-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-semibold text-white transition-all duration-300"
-            >
-              Sign In
             </a>
           </div>
         </nav>
@@ -233,15 +229,6 @@ export function NewNavbar() {
                 <span className="relative z-10">Bonuses</span>
                 <span className="absolute bottom-1 left-0 w-full h-[6px] bg-[#85C7FF] opacity-30 -skew-x-12 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
               </a>
-              <a
-                href="https://wager.com/?overlay=login"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="relative group text-4xl font-black uppercase tracking-tight text-[#85C7FF] transition-all duration-500"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Sign In
-              </a>
             </div>
             
             <div className="mt-16 w-full max-w-[280px] h-[1px] bg-white/10" />
@@ -251,7 +238,7 @@ export function NewNavbar() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group flex items-center gap-3 px-8 py-4 rounded-xl bg-gradient-to-r from-[#85C7FF] to-[#60a5fa] hover:from-[#60a5fa] hover:to-[#85C7FF] text-black font-black uppercase tracking-wide shadow-[0_0_20px_rgba(133,199,255,0.3)] transition-all duration-300 hover:scale-105"
-                href="https://wager.com"
+                href={signupUrl}
               >
                 Play Now
                 <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
