@@ -15,13 +15,13 @@ export function NewPodiumSection({ topThree }: NewPodiumSectionProps) {
 
   const formatValue = (value: string) => {
     const num = parseFloat(value.replace(/,/g, ''));
-    if (num >= 1000000) {
-      return `${(num / 1000000).toFixed(1)}M`;
+    if (Number.isNaN(num)) {
+      return value;
     }
-    if (num >= 1000) {
-      return `${Math.round(num / 1000)}K`;
-    }
-    return num.toLocaleString();
+    return num.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
   };
 
   const getInitials = (username: string) => {
