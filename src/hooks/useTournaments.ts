@@ -41,11 +41,15 @@ interface TournamentsResponse {
 interface UseTournamentsOptions {
   apiHost?: string;
   useMockData?: boolean;
+  preferredCode?: string | null;
+  preferredTournamentId?: string | null;
 }
 
 export function useTournaments({ 
   apiHost = 'https://api.wager.com',
-  useMockData = false 
+  useMockData = false,
+  preferredCode = null,
+  preferredTournamentId = null,
 }: UseTournamentsOptions = {}) {
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [activeTournament, setActiveTournament] = useState<Tournament | null>(null);
@@ -98,9 +102,29 @@ export function useTournaments({
           
           setTournaments(result.data || []);
           
-          // Set the first tournament as active
+          // Prefer a specific tournament ID when provided (supports current_tournament.id)
+          const normalizedPreferredTournamentId = preferredTournamentId?.trim();
+          const tournamentById = normalizedPreferredTournamentId
+            ? result.data.find((tournament) => {
+                const idMatches = String(tournament.id) === normalizedPreferredTournamentId;
+                const currentIdMatches = String(tournament.current_tournament?.id ?? '') === normalizedPreferredTournamentId;
+                return idMatches || currentIdMatches;
+              })
+            : null;
+
+          // Otherwise prefer matching streamer code (e.g. BTX)
+          const normalizedPreferredCode = preferredCode?.trim().toLowerCase();
+          const tournamentByCode = !tournamentById && normalizedPreferredCode
+            ? result.data.find((tournament) => {
+                const code = tournament.code?.toLowerCase() ?? '';
+                const currentCode = tournament.current_tournament?.code?.toLowerCase() ?? '';
+                return code === normalizedPreferredCode || currentCode === normalizedPreferredCode;
+              })
+            : null;
+
+          // Fallback to the first ongoing tournament
           if (result.data && result.data.length > 0) {
-            const tournament = result.data[0];
+            const tournament = tournamentById || tournamentByCode || result.data[0];
             
             // Use current_tournament.id if available, otherwise use main tournament id
             const tournamentId = tournament.current_tournament?.id 
@@ -132,7 +156,7 @@ export function useTournaments({
     };
 
     fetchTournaments();
-  }, [apiHost, useMockData]);
+  }, [apiHost, useMockData, preferredCode, preferredTournamentId]);
 
   return {
     tournaments,
