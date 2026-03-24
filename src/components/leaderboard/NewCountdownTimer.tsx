@@ -6,42 +6,59 @@ interface NewCountdownTimerProps {
   hours?: number;
   minutes?: number;
   seconds?: number;
+  startAt?: string;
+  endAt?: string;
 }
 
 export function NewCountdownTimer({ 
   days = 25,
   hours = 6, 
   minutes = 45, 
-  seconds = 1 
+  seconds = 1,
+  startAt,
+  endAt,
 }: NewCountdownTimerProps) {
-  const [time, setTime] = useState({ days, hours, minutes, seconds });
+  const getTimeFromRange = () => {
+    if (!startAt || !endAt) {
+      return { days, hours, minutes, seconds };
+    }
+
+    const startMs = new Date(startAt).getTime();
+    const endMs = new Date(endAt).getTime();
+
+    if (Number.isNaN(startMs) || Number.isNaN(endMs) || endMs <= startMs) {
+      return { days, hours, minutes, seconds };
+    }
+
+    const nowMs = Date.now();
+    const remainingMs =
+      nowMs <= startMs ? endMs - startMs : Math.max(0, endMs - nowMs);
+
+    const totalSeconds = Math.floor(remainingMs / 1000);
+    const computedDays = Math.floor(totalSeconds / 86400);
+    const computedHours = Math.floor((totalSeconds % 86400) / 3600);
+    const computedMinutes = Math.floor((totalSeconds % 3600) / 60);
+    const computedSeconds = totalSeconds % 60;
+
+    return {
+      days: computedDays,
+      hours: computedHours,
+      minutes: computedMinutes,
+      seconds: computedSeconds,
+    };
+  };
+
+  const [time, setTime] = useState(getTimeFromRange);
 
   useEffect(() => {
+    setTime(getTimeFromRange());
+
     const interval = setInterval(() => {
-      setTime(prev => {
-        let { days, hours, minutes, seconds } = prev;
-        seconds--;
-        if (seconds < 0) {
-          seconds = 59;
-          minutes--;
-        }
-        if (minutes < 0) {
-          minutes = 59;
-          hours--;
-        }
-        if (hours < 0) {
-          hours = 23;
-          days--;
-        }
-        if (days < 0) {
-          days = 30;
-        }
-        return { days, hours, minutes, seconds };
-      });
+      setTime(getTimeFromRange());
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [startAt, endAt, days, hours, minutes, seconds]);
 
   const isButcherTheme = BRANDING.streamerCode === 'butcher';
   const primaryColor = isButcherTheme ? BRANDING.theme.secondaryColor : '#85C7FF';

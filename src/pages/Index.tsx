@@ -16,10 +16,13 @@ const Index = () => {
   // If VITE_TOURNAMENT_ID is set in Vercel env vars, skip the tournaments API call
   const envTournamentId = API_CONFIG.TOURNAMENT_ID;
 
-  // Only fetch tournaments if no tournament ID is set in env vars
-  const { activeTournament, isLoading: tournamentsLoading } = useTournaments({
+  const preferredCode = BRANDING.customText?.referralCode || BRANDING.streamerCode;
+
+  const { tournaments, activeTournament, isLoading: tournamentsLoading } = useTournaments({
     apiHost,
-    useMockData: !!envTournamentId, // Skip real API call if envTournamentId is set
+    useMockData: false,
+    preferredCode,
+    preferredTournamentId: envTournamentId ? String(envTournamentId) : null,
   });
 
   // Determine tournament ID:
@@ -31,6 +34,17 @@ const Index = () => {
       ? String(activeTournament.id)
       : null;
 
+  // Find the resolved tournament payload for countdown start/end dates.
+  const resolvedTournament = envTournamentId
+    ? tournaments.find((tournament) => {
+        const envId = String(envTournamentId);
+        return String(tournament.id) === envId || String(tournament.current_tournament?.id ?? '') === envId;
+      }) || activeTournament
+    : activeTournament;
+
+  const countdownStartAt = resolvedTournament?.current_tournament?.start_at || resolvedTournament?.start_at;
+  const countdownEndAt = resolvedTournament?.current_tournament?.end_at || resolvedTournament?.end_at;
+
   // Fetch leaderboard for the active tournament
   const { topThree, restOfLeaderboard, currentUser, isLoading: leaderboardLoading, error } = useLeaderboard({
     tournamentId: tournamentId || undefined,
@@ -39,7 +53,7 @@ const Index = () => {
     includeMe: true,
   });
 
-  const isLoading = (!envTournamentId && tournamentsLoading) || leaderboardLoading;
+  const isLoading = tournamentsLoading || leaderboardLoading;
 
   return (
     <div className="relative min-h-screen text-white overflow-hidden">
@@ -61,7 +75,7 @@ const Index = () => {
         
         {/* Countdown Timer */}
         <div className="px-4 sm:px-6 mt-12">
-          <NewCountdownTimer />
+          <NewCountdownTimer startAt={countdownStartAt} endAt={countdownEndAt} />
         </div>
         
         {/* Period Toggle */}
