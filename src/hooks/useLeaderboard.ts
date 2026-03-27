@@ -157,13 +157,113 @@ interface UseLeaderboardOptions {
   useMockData?: boolean;
   apiHost?: string;
   includeMe?: boolean;
+  csvUrl?: string | null;
 }
+
+const parseCsvLine = (line: string): string[] => {
+  const values: string[] = [];
+  let current = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+
+    if (char === '"') {
+      inQuotes = !inQuotes;
+      continue;
+    }
+
+    if (char === ',' && !inQuotes) {
+      values.push(current.trim());
+      current = '';
+      continue;
+    }
+
+    current += char;
+  }
+
+  values.push(current.trim());
+  return values;
+};
+
+const toNumberString = (raw: string): string => {
+  const num = parseFloat(raw.replace(/,/g, '').trim());
+  if (Number.isNaN(num)) {
+    return '0.00';
+  }
+
+  return num.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+};
+
+const parseCsvLeaderboardEntries = (csvText: string): LeaderboardEntry[] => {
+  const lines = csvText
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  if (lines.length <= 1) {
+    return [];
+  }
+
+  const entries: LeaderboardEntry[] = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const cols = parseCsvLine(lines[i]);
+    if (cols.length < 4) {
+      continue;
+    }
+
+    const rank = parseInt(cols[0], 10);
+    if (Number.isNaN(rank)) {
+      continue;
+    }
+
+    const playerId = parseInt(cols[1].replace(/,/g, ''), 10) || 0;
+    const username = cols[2] || `Player ${rank}`;
+    const value = toNumberString(cols[3]);
+
+    entries.push({
+      rank,
+      player: {
+        id: playerId,
+        uuid: `csv-${playerId || rank}`,
+        username,
+        avatar_url: null,
+      },
+      prize: {
+        type: 'cash',
+        amount: '0.00',
+        currency_code: 'USD',
+      },
+      value,
+      currency: {
+        name: 'US Dollar',
+        code: 'USD',
+        symbol: '$',
+        decimals: 2,
+        order: null,
+        type: 1,
+        type_name: 'Fiat Money',
+        is_default: 1,
+      },
+      mechanic_type: 0,
+      mechanic_type_name: 'Turnover',
+      me: false,
+    });
+  }
+
+  return entries.sort((a, b) => a.rank - b.rank);
+};
 
 export function useLeaderboard({ 
   tournamentId, 
   useMockData = true,
   apiHost = 'https://api.wager.com',
-  includeMe = true
+  includeMe = true,
+  csvUrl = null,
 }: UseLeaderboardOptions = {}) {
   const [data, setData] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -226,12 +326,35 @@ export function useLeaderboard({
           throw new Error('API response data is not an array');
         }
         
-        setData(result.data || []);
+        let finalData = result.data || [];
+        let userEntry = result.data?.find(entry => entry.me === true) || null;
+
+        // Optional CSV override: use rank + wagered values from uploaded CSV.
+        if (csvUrl) {
+          try {
+            const csvResponse = await fetch(csvUrl, {
+              method: 'GET',
+              headers: {
+                'Accept': 'text/csv,text/plain,*/*',
+              },
+            });
+
+            if (csvResponse.ok) {
+              const csvText = await csvResponse.text();
+              const csvEntries = parseCsvLeaderboardEntries(csvText);
+              if (csvEntries.length > 0) {
+                finalData = csvEntries;
+                userEntry = null;
+              }
+            }
+          } catch {
+            // Fallback to API data if CSV cannot be loaded.
+          }
+        }
+
+        setData(finalData);
         setHasMore(result.has_more || false);
-        
-        // Find current user in data (me: true)
-        const userEntry = result.data?.find(entry => entry.me === true);
-        setCurrentUser(userEntry || null);
+        setCurrentUser(userEntry);
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred';
@@ -241,7 +364,7 @@ export function useLeaderboard({
     } finally {
       setIsLoading(false);
     }
-  }, [tournamentId, useMockData, apiHost, includeMe]);
+  }, [tournamentId, useMockData, apiHost, includeMe, csvUrl]);
 
   useEffect(() => {
     // Only fetch if we have a valid tournament ID (not null, not undefined, not empty)

@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from 'react';
 import { LeaderboardEntry } from '@/types/leaderboard';
 import { EmptyLeaderboard } from './EmptyLeaderboard';
 import { BRANDING } from '@/config/branding';
@@ -12,6 +13,25 @@ export function NewLeaderboardTable({ entries, currentUser }: NewLeaderboardTabl
   if (entries.length === 0) {
     return <EmptyLeaderboard />;
   }
+
+  const pageSize = 15;
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.max(1, Math.ceil(entries.length / pageSize));
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [entries.length]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  const paginatedEntries = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return entries.slice(start, start + pageSize);
+  }, [entries, currentPage]);
   
   const isButcherTheme = BRANDING.streamerCode === 'butcher';
   const primaryColor = isButcherTheme ? BRANDING.theme.secondaryColor : '#85C7FF';
@@ -35,6 +55,15 @@ export function NewLeaderboardTable({ entries, currentUser }: NewLeaderboardTabl
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
+  };
+
+  const maskUsername = (username: string, short = false) => {
+    if (!username) return '***';
+    if (username.length <= 4) return username;
+    if (short) {
+      return `${username.slice(0, 2)}***${username.slice(-2)}`;
+    }
+    return `${username.slice(0, 2)}*****${username.slice(-3)}`;
   };
 
   const getInitials = (username: string) => {
@@ -123,7 +152,7 @@ export function NewLeaderboardTable({ entries, currentUser }: NewLeaderboardTabl
           
           {/* Entries */}
           <div className="flex flex-col relative">
-            {entries.map((entry) => (
+            {paginatedEntries.map((entry) => (
               <div 
                 key={entry.player.uuid} 
                 className={`group relative leaderboard-row ${isButcherTheme ? 'butcher-theme' : ''} ${isUserInList(entry) ? isButcherTheme ? 'bg-[rgba(220,20,60,0.1)]' : 'bg-[#85C7FF]/5' : ''}`}
@@ -158,7 +187,7 @@ export function NewLeaderboardTable({ entries, currentUser }: NewLeaderboardTabl
                   {/* Player */}
                   <div className="flex items-center overflow-hidden relative z-10">
                     <span className="truncate font-semibold text-sm transition-colors text-white">
-                      {entry.player.username}
+                      {maskUsername(entry.player.username)}
                       {isUserInList(entry) && (
                         <span 
                           className="ml-2 text-xs font-black"
@@ -228,7 +257,7 @@ export function NewLeaderboardTable({ entries, currentUser }: NewLeaderboardTabl
                   {/* Player info */}
                   <div className="flex-1 min-w-0 relative z-10">
                     <span className="block truncate font-semibold text-xs text-white">
-                      {entry.player.username}
+                      {maskUsername(entry.player.username, true)}
                       {isUserInList(entry) && (
                         <span 
                           className="ml-1 text-[10px] font-bold"
@@ -282,6 +311,77 @@ export function NewLeaderboardTable({ entries, currentUser }: NewLeaderboardTabl
               </div>
             ))}
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div
+              className="flex items-center justify-between gap-2 px-3 py-3 sm:px-5 sm:py-4 border-t"
+              style={{ borderColor }}
+            >
+              <button
+                type="button"
+                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="rounded-md px-3 py-1.5 text-xs sm:text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
+                style={{
+                  color: primaryColor,
+                  border: `1px solid ${borderColor}`,
+                  background: isButcherTheme ? 'rgba(220, 20, 60, 0.08)' : 'rgba(82, 97, 151, 0.08)',
+                }}
+              >
+                Prev
+              </button>
+
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                {Array.from({ length: totalPages }, (_, idx) => idx + 1)
+                  .filter((page) => {
+                    if (totalPages <= 7) return true;
+                    if (page === 1 || page === totalPages) return true;
+                    return Math.abs(page - currentPage) <= 1;
+                  })
+                  .map((page, idx, arr) => {
+                    const previous = arr[idx - 1];
+                    const showGap = previous && page - previous > 1;
+
+                    return (
+                      <div key={page} className="flex items-center gap-1.5 sm:gap-2">
+                        {showGap && (
+                          <span className="text-xs text-white/40">...</span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => setCurrentPage(page)}
+                          className="min-w-7 rounded-md px-2 py-1 text-xs sm:text-sm font-semibold transition-colors"
+                          style={{
+                            color: page === currentPage ? '#ffffff' : primaryColor,
+                            background: page === currentPage
+                              ? (isButcherTheme ? 'rgba(220, 20, 60, 0.45)' : 'rgba(82, 97, 151, 0.45)')
+                              : 'transparent',
+                            border: `1px solid ${page === currentPage ? primaryColor : borderColor}`,
+                          }}
+                        >
+                          {page}
+                        </button>
+                      </div>
+                    );
+                  })}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="rounded-md px-3 py-1.5 text-xs sm:text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
+                style={{
+                  color: primaryColor,
+                  border: `1px solid ${borderColor}`,
+                  background: isButcherTheme ? 'rgba(220, 20, 60, 0.08)' : 'rgba(82, 97, 151, 0.08)',
+                }}
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </section>
