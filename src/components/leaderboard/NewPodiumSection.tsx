@@ -28,25 +28,34 @@ export function NewPodiumSection({ topThree }: NewPodiumSectionProps) {
     return username.substring(0, 2).toUpperCase();
   };
 
+  const maskUsername = (username: string, short = false) => {
+    if (!username) return '***';
+    if (username.length <= 4) return username;
+    if (short) {
+      return `${username.slice(0, 2)}***${username.slice(-2)}`;
+    }
+    return `${username.slice(0, 2)}*****${username.slice(-3)}`;
+  };
+
   return (
     <div className="w-full my-8 md:my-14 px-3 md:px-4 min-h-[280px] md:min-h-[380px]">
       {/* Desktop Podium */}
       <div className="hidden md:flex items-end justify-center gap-3 sm:gap-4 max-w-4xl mx-auto h-[305px]">
         {/* Second Place */}
-        <PodiumCard entry={second} position="second" getInitials={getInitials} formatValue={formatValue} />
+        <PodiumCard entry={second} position="second" getInitials={getInitials} formatValue={formatValue} maskUsername={maskUsername} />
         
         {/* First Place */}
-        <PodiumCard entry={first} position="first" getInitials={getInitials} formatValue={formatValue} />
+        <PodiumCard entry={first} position="first" getInitials={getInitials} formatValue={formatValue} maskUsername={maskUsername} />
         
         {/* Third Place */}
-        <PodiumCard entry={third} position="third" getInitials={getInitials} formatValue={formatValue} />
+        <PodiumCard entry={third} position="third" getInitials={getInitials} formatValue={formatValue} maskUsername={maskUsername} />
       </div>
       
       {/* Mobile Podium */}
       <div className="md:hidden flex items-end justify-center gap-1.5 max-w-lg mx-auto h-[180px]">
-        <PodiumCardMobile entry={second} position="second" getInitials={getInitials} formatValue={formatValue} />
-        <PodiumCardMobile entry={first} position="first" getInitials={getInitials} formatValue={formatValue} />
-        <PodiumCardMobile entry={third} position="third" getInitials={getInitials} formatValue={formatValue} />
+        <PodiumCardMobile entry={second} position="second" getInitials={getInitials} formatValue={formatValue} maskUsername={maskUsername} />
+        <PodiumCardMobile entry={first} position="first" getInitials={getInitials} formatValue={formatValue} maskUsername={maskUsername} />
+        <PodiumCardMobile entry={third} position="third" getInitials={getInitials} formatValue={formatValue} maskUsername={maskUsername} />
       </div>
     </div>
   );
@@ -57,9 +66,10 @@ interface PodiumCardProps {
   position: 'first' | 'second' | 'third';
   getInitials: (username: string) => string;
   formatValue: (value: string) => string;
+  maskUsername: (username: string, short?: boolean) => string;
 }
 
-function PodiumCard({ entry, position, getInitials, formatValue }: PodiumCardProps) {
+function PodiumCard({ entry, position, getInitials, formatValue, maskUsername }: PodiumCardProps) {
   const isButcherTheme = BRANDING.streamerCode === 'butcher';
   const primaryColor = isButcherTheme ? BRANDING.theme.secondaryColor : '#85C7FF';
   const accentColor = isButcherTheme ? BRANDING.theme.accentColor : '#99D0FF';
@@ -201,7 +211,7 @@ function PodiumCard({ entry, position, getInitials, formatValue }: PodiumCardPro
           
           {/* Username */}
           <h3 className={`mt-3 text-xs font-black ${isFirst ? 'text-sm text-white' : 'text-[#E8E5FF]'} truncate max-w-[95%]`}>
-            {entry.player.username}
+            {maskUsername(entry.player.username)}
           </h3>
           
           {/* Prize and wagered amount - blood red */}
@@ -251,7 +261,7 @@ function PodiumCard({ entry, position, getInitials, formatValue }: PodiumCardPro
   );
 }
 
-function PodiumCardMobile({ entry, position, getInitials, formatValue }: PodiumCardProps) {
+function PodiumCardMobile({ entry, position, getInitials, formatValue, maskUsername }: PodiumCardProps) {
   const isButcherTheme = BRANDING.streamerCode === 'butcher';
   const primaryColor = isButcherTheme ? BRANDING.theme.secondaryColor : '#85C7FF';
   const accentColor = isButcherTheme ? BRANDING.theme.accentColor : '#99D0FF';
@@ -377,7 +387,7 @@ function PodiumCardMobile({ entry, position, getInitials, formatValue }: PodiumC
               textShadow: isButcherTheme ? `0 0 8px ${primaryColor}40` : undefined,
             }}
           >
-            {entry.player.username}
+            {maskUsername(entry.player.username, true)}
           </h3>
           
           <div className="mt-auto w-full px-0.5">

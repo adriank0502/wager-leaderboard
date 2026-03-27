@@ -46,11 +46,16 @@ const Index = () => {
   const countdownEndAt = resolvedTournament?.current_tournament?.end_at || resolvedTournament?.end_at;
 
   // Fetch leaderboard for the active tournament
+  const csvUrl = BRANDING.streamerCode === 'butcher'
+    ? '/btx_leaderboard_rankings_2026-03-27T12_24_50.455404177Z.csv'
+    : null;
+
   const { topThree, restOfLeaderboard, currentUser, isLoading: leaderboardLoading, error } = useLeaderboard({
     tournamentId: tournamentId || undefined,
     useMockData: false,
     apiHost,
     includeMe: true,
+    csvUrl,
   });
 
   const isLoading = tournamentsLoading || leaderboardLoading;
