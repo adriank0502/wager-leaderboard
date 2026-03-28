@@ -47,7 +47,7 @@ const Index = () => {
 
   // Fetch leaderboard for the active tournament
   const csvUrl = BRANDING.streamerCode === 'butcher'
-    ? '/btx_leaderboard_rankings_2026-03-27T12_24_50.455404177Z.csv'
+    ? '/btx_leaderboard_rankings_2026-03-28T19_56_40.75166429Z.csv'
     : null;
 
   const { topThree, restOfLeaderboard, currentUser, isLoading: leaderboardLoading, error } = useLeaderboard({

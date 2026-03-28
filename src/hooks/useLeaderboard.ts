@@ -169,7 +169,13 @@ const parseCsvLine = (line: string): string[] => {
     const char = line[i];
 
     if (char === '"') {
-      inQuotes = !inQuotes;
+      // Handle escaped double-quote inside quoted field ("")
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i++; // Skip the next quote
+      } else {
+        inQuotes = !inQuotes;
+      }
       continue;
     }
 
@@ -208,22 +214,50 @@ const parseCsvLeaderboardEntries = (csvText: string): LeaderboardEntry[] => {
     return [];
   }
 
+  const headerCols = parseCsvLine(lines[0]).map((h) => h.toLowerCase());
+  const colIndex = (name: string, fallback: number | null = null): number | null => {
+    const idx = headerCols.indexOf(name.toLowerCase());
+    return idx >= 0 ? idx : fallback;
+  };
+
+  const idxRank = colIndex('rank_position', 0);
+  const idxPlayerId = colIndex('player_id', 1);
+  const idxUsername = colIndex('username', 2);
+  const idxValue = colIndex('total_wager_usd', 3);
+
   const entries: LeaderboardEntry[] = [];
 
   for (let i = 1; i < lines.length; i++) {
-    const cols = parseCsvLine(lines[i]);
-    if (cols.length < 4) {
+    // Some exporters wrap the entire row in quotes and escape inner quotes.
+    // Example: "1,""79,131"",neksann77,""170,689.9"",27"
+    // Normalize such rows by removing the outer quotes and un-escaping inner quotes.
+    let rawLine = lines[i];
+    if (rawLine.startsWith('"') && rawLine.endsWith('"')) {
+      const inner = rawLine.slice(1, -1);
+      // Only treat as wrapped if after un-escape we see expected commas
+      if (inner.includes('",') || inner.includes(',"')) {
+        rawLine = inner.replace(/""/g, '"');
+      }
+    }
+
+    const cols = parseCsvLine(rawLine);
+    if (cols.length < 3) {
       continue;
     }
 
-    const rank = parseInt(cols[0], 10);
+    const rankRaw = idxRank !== null ? cols[idxRank] : cols[0];
+    const rank = parseInt(String(rankRaw).replace(/[^0-9]/g, ''), 10);
     if (Number.isNaN(rank)) {
       continue;
     }
 
-    const playerId = parseInt(cols[1].replace(/,/g, ''), 10) || 0;
-    const username = cols[2] || `Player ${rank}`;
-    const value = toNumberString(cols[3]);
+    const playerIdRaw = idxPlayerId !== null ? cols[idxPlayerId] : cols[1];
+    const playerId = parseInt(String(playerIdRaw).replace(/[^0-9]/g, ''), 10) || 0;
+
+    const username = (idxUsername !== null ? cols[idxUsername] : cols[2]) || `Player ${rank}`;
+
+    const valueRaw = idxValue !== null ? cols[idxValue] : cols[3];
+    const value = toNumberString(valueRaw);
 
     entries.push({
       rank,
@@ -278,8 +312,8 @@ export function useLeaderboard({
   }));
 
   const fetchLeaderboard = useCallback(async () => {
-    // Guard: Don't fetch if no tournament ID
-    if (!tournamentId || tournamentId.trim() === '') {
+    // Guard: Only bail if neither tournamentId nor csvUrl is provided
+    if ((!tournamentId || tournamentId.trim() === '') && !csvUrl) {
       setIsLoading(false);
       return;
     }
@@ -295,39 +329,45 @@ export function useLeaderboard({
         setHasMore(false);
         setCurrentUser(null);
       } else {
-        const includeParam = includeMe ? '&include_me=true' : '';
-        const url = `${apiHost}/player/api/v1/tournaments/${tournamentId}/leaderboard?per_page=100${includeParam}`;
-        
-        const response = await fetch(url, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include', // Include cookies for authentication
-        });
+        let finalData: LeaderboardEntry[] = [];
+        let userEntry: LeaderboardEntry | null = null;
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Failed to fetch leaderboard data: ${response.status} ${response.statusText}`);
-        }
+        // If we have a tournamentId, attempt to fetch API data first
+        if (tournamentId && tournamentId.trim() !== '') {
+          const includeParam = includeMe ? '&include_me=true' : '';
+          const url = `${apiHost}/player/api/v1/tournaments/${tournamentId}/leaderboard?per_page=100${includeParam}`;
+          
+          const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+          });
 
-        const responseText = await response.text();
-        
-        let result: LeaderboardResponse;
-        try {
-          result = JSON.parse(responseText);
-        } catch (parseError) {
-          throw new Error('Invalid JSON response from API');
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Failed to fetch leaderboard data: ${response.status} ${response.statusText}`);
+          }
+
+          const responseText = await response.text();
+          
+          let result: LeaderboardResponse;
+          try {
+            result = JSON.parse(responseText);
+          } catch (parseError) {
+            throw new Error('Invalid JSON response from API');
+          }
+          
+          if (!Array.isArray(result.data)) {
+            throw new Error('API response data is not an array');
+          }
+          
+          finalData = result.data || [];
+          userEntry = result.data?.find(entry => entry.me === true) || null;
+          setHasMore(result.has_more || false);
         }
-        
-        // Check if data is actually an array
-        if (!Array.isArray(result.data)) {
-          throw new Error('API response data is not an array');
-        }
-        
-        let finalData = result.data || [];
-        let userEntry = result.data?.find(entry => entry.me === true) || null;
 
         // Optional CSV override: use rank + wagered values from uploaded CSV.
         if (csvUrl) {
@@ -345,6 +385,7 @@ export function useLeaderboard({
               if (csvEntries.length > 0) {
                 finalData = csvEntries;
                 userEntry = null;
+                setHasMore(false);
               }
             }
           } catch {
@@ -353,7 +394,6 @@ export function useLeaderboard({
         }
 
         setData(finalData);
-        setHasMore(result.has_more || false);
         setCurrentUser(userEntry);
       }
     } catch (err) {
@@ -367,8 +407,8 @@ export function useLeaderboard({
   }, [tournamentId, useMockData, apiHost, includeMe, csvUrl]);
 
   useEffect(() => {
-    // Only fetch if we have a valid tournament ID (not null, not undefined, not empty)
-    if (tournamentId && tournamentId.trim() !== '') {
+    // Fetch if we have a valid tournament ID OR a csvUrl override
+    if ((tournamentId && tournamentId.trim() !== '') || csvUrl) {
       fetchLeaderboard();
     } else {
       // Reset state if no valid tournament ID
