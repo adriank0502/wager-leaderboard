@@ -9,6 +9,7 @@ import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useTournaments } from '@/hooks/useTournaments';
 import { API_CONFIG } from '@/config/api';
 import { BRANDING } from '@/config/branding';
+import { getHardcodedPrize } from '@/utils/prizes';
 
 const Index = () => {
   const apiHost = import.meta.env.VITE_API_HOST || 'https://api.wager.com';
@@ -93,7 +94,12 @@ const Index = () => {
         {!isLoading && (
           <>
             {restOfLeaderboard.length > 0 ? (
-              <NewLeaderboardTable entries={restOfLeaderboard} currentUser={currentUser} />
+              <NewLeaderboardTable 
+                entries={restOfLeaderboard
+                  .filter((e) => getHardcodedPrize(e.rank) !== '0')
+                  .filter((e) => e.rank <= 18)} 
+                currentUser={currentUser} 
+              />
             ) : topThree.length === 0 ? (
               <NewLeaderboardTable entries={[]} currentUser={currentUser} />
             ) : null}
