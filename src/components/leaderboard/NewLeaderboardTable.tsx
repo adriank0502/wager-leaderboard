@@ -59,10 +59,18 @@ export function NewLeaderboardTable({ entries, currentUser }: NewLeaderboardTabl
 
   const maskUsername = (username: string, short = false) => {
     if (!username) return '***';
-    if (username.length <= 4) return username;
+    const len = username.length;
+
     if (short) {
+      if (len <= 2) return `${username[0]}*`;
+      if (len === 3) return `${username[0]}*${username[2]}`;
+      if (len === 4) return `${username.slice(0, 1)}**${username.slice(-1)}`;
       return `${username.slice(0, 2)}***${username.slice(-2)}`;
     }
+
+    if (len <= 2) return `${username[0]}*`;
+    if (len === 3) return `${username[0]}*${username[2]}`;
+    if (len === 4) return `${username.slice(0, 2)}**`;
     return `${username.slice(0, 2)}*****${username.slice(-3)}`;
   };
 
