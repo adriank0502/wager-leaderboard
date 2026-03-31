@@ -81,7 +81,27 @@ const Index = () => {
         
         {/* Countdown Timer */}
         <div className="px-4 sm:px-6 mt-12">
-          <NewCountdownTimer startAt={countdownStartAt} endAt={countdownEndAt} />
+          <NewCountdownTimer 
+            startAt={countdownStartAt} 
+            endAt={countdownEndAt} 
+            forceZero={BRANDING.streamerCode === 'butcher'}
+          />
+
+          {BRANDING.streamerCode === 'butcher' && (
+            <div className="mt-4 mx-auto max-w-3xl rounded-xl border p-4 text-center"
+              style={{ 
+                borderColor: 'rgba(220, 20, 60, 0.35)',
+                background: 'rgba(26, 0, 0, 0.6)'
+              }}
+            >
+              <p className="text-sm sm:text-base font-semibold text-white">
+                We Will Be Processing Manual Payouts Due To Wagering Issues Related to OTC Sportsbets
+              </p>
+              <p className="text-xs sm:text-sm text-white/80 mt-1">
+                Winners Will Be Contacted And Awarded Within 12 hours
+              </p>
+            </div>
+          )}
         </div>
         
         {/* Period Toggle */}

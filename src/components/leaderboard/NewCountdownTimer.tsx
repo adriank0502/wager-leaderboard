@@ -8,6 +8,7 @@ interface NewCountdownTimerProps {
   seconds?: number;
   startAt?: string;
   endAt?: string;
+  forceZero?: boolean;
 }
 
 export function NewCountdownTimer({ 
@@ -17,8 +18,12 @@ export function NewCountdownTimer({
   seconds = 1,
   startAt,
   endAt,
+  forceZero = false,
 }: NewCountdownTimerProps) {
   const getTimeFromRange = () => {
+    if (forceZero) {
+      return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+    }
     if (!startAt || !endAt) {
       return { days, hours, minutes, seconds };
     }
@@ -53,12 +58,16 @@ export function NewCountdownTimer({
   useEffect(() => {
     setTime(getTimeFromRange());
 
+    if (forceZero) {
+      return;
+    }
+
     const interval = setInterval(() => {
       setTime(getTimeFromRange());
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [startAt, endAt, days, hours, minutes, seconds]);
+  }, [startAt, endAt, days, hours, minutes, seconds, forceZero]);
 
   const isButcherTheme = BRANDING.streamerCode === 'butcher';
   const primaryColor = isButcherTheme ? BRANDING.theme.secondaryColor : '#85C7FF';
