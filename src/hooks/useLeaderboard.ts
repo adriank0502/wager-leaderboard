@@ -409,8 +409,34 @@ export function useLeaderboard({
           }
         }
 
-        if (!shallowEqual(data, finalData)) {
-          setData(finalData);
+        // Stable merge by player.uuid to preserve object identity for unchanged rows
+        if (finalData && finalData.length > 0) {
+          const prevByUuid = new Map<string, LeaderboardEntry>(
+            (data || []).map((e) => [e.player?.uuid, e])
+          );
+          const merged: LeaderboardEntry[] = finalData
+            .slice()
+            .sort((a, b) => a.rank - b.rank)
+            .map((incoming) => {
+              const prev = prevByUuid.get(incoming.player?.uuid);
+              if (
+                prev &&
+                prev.rank === incoming.rank &&
+                prev.value === incoming.value &&
+                prev.prize?.amount === incoming.prize?.amount
+              ) {
+                return prev; // reuse reference to avoid re-render flicker
+              }
+              return incoming;
+            });
+
+          if (!shallowEqual(data, merged)) {
+            setData(merged);
+          }
+        } else {
+          if (!shallowEqual(data, finalData)) {
+            setData(finalData);
+          }
         }
         setCurrentUser(userEntry);
       }

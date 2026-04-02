@@ -233,7 +233,8 @@ export function MikeLeaderboard({ topThree, entries, startAt, endAt }: MikeLeade
                 key={e.player.uuid}
                 className="transition-colors"
                 style={{
-                  background: idx % 2 === 0 ? '#0a0f1a' : '#0c1120',
+                  // Use rank-based striping so rows don't flip colors on refresh
+                  background: e.rank % 2 === 0 ? '#0a0f1a' : '#0c1120',
                 }}
               >
                 <td className="p-[8px_14px] border-b font-black text-white" style={{ borderColor: 'rgba(120,140,180,0.16)' }}>{e.rank}.</td>
