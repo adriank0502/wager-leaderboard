@@ -8,7 +8,7 @@ interface NewPrizeHeroProps {
 }
 
 export function NewPrizeHero({ 
-  prizeAmount = "$5,000", 
+  prizeAmount = "$50,000", 
   period = "Monthly",
   description = "Sign up using referral code WAGER and start wagering to compete for prizes",
   streamerName = "WAGER"
