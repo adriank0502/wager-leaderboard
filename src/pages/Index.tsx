@@ -1,15 +1,10 @@
-import { AnimatedBackground } from '@/components/leaderboard/AnimatedBackground';
 import { NewNavbar } from '@/components/leaderboard/NewNavbar';
-import { NewPrizeHero } from '@/components/leaderboard/NewPrizeHero';
-import { NewCountdownTimer } from '@/components/leaderboard/NewCountdownTimer';
-import { PeriodToggle } from '@/components/leaderboard/PeriodToggle';
-import { NewPodiumSection } from '@/components/leaderboard/NewPodiumSection';
-import { NewLeaderboardTable } from '@/components/leaderboard/NewLeaderboardTable';
+import { MikeLeaderboard } from '@/components/leaderboard/MikeLeaderboard';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useTournaments } from '@/hooks/useTournaments';
 import { API_CONFIG } from '@/config/api';
 import { BRANDING } from '@/config/branding';
-import { getHardcodedPrize } from '@/utils/prizes';
+import { useEffect } from 'react';
 
 const Index = () => {
   const apiHost = import.meta.env.VITE_API_HOST || 'https://api.wager.com';
@@ -26,14 +21,8 @@ const Index = () => {
     preferredTournamentId: envTournamentId ? String(envTournamentId) : null,
   });
 
-  // Determine tournament ID:
-  // 1. Use VITE_TOURNAMENT_ID env var if set (per-streamer Vercel deployment)
-  // 2. Otherwise use the ID from the tournaments API response
-  const tournamentId = envTournamentId
-    ? String(envTournamentId)
-    : activeTournament?.id
-      ? String(activeTournament.id)
-      : null;
+  // Force tournament ID to 121148 per request
+  const tournamentId = '121148';
 
   // Find the resolved tournament payload for countdown start/end dates.
   const resolvedTournament = envTournamentId
@@ -43,15 +32,17 @@ const Index = () => {
       }) || activeTournament
     : activeTournament;
 
-  const countdownStartAt = resolvedTournament?.current_tournament?.start_at || resolvedTournament?.start_at;
-  const countdownEndAt = resolvedTournament?.current_tournament?.end_at || resolvedTournament?.end_at;
+  // Explicit countdown window per request (fallbacks to API if needed)
+  const explicitStartAt = '2026-03-01T00:00:00.000Z';
+  const explicitEndAt = '2026-04-19T21:00:00.000Z';
+  const countdownStartAt = explicitStartAt || resolvedTournament?.current_tournament?.start_at || resolvedTournament?.start_at;
+  const countdownEndAt = explicitEndAt || resolvedTournament?.current_tournament?.end_at || resolvedTournament?.end_at;
 
   // Fetch leaderboard for the active tournament
-  const csvUrl = BRANDING.streamerCode === 'butcher'
-    ? '/btx_leaderboard_rankings_2026-04-01T06_57_47.353568436Z.csv'
-    : null;
+  // Use live API only (no CSV override)
+  const csvUrl = null;
 
-  const { topThree, restOfLeaderboard, currentUser, isLoading: leaderboardLoading, error } = useLeaderboard({
+  const { topThree, restOfLeaderboard, currentUser, isLoading: leaderboardLoading, error, refetchSilent } = useLeaderboard({
     tournamentId: tournamentId || undefined,
     useMockData: false,
     apiHost,
@@ -61,80 +52,28 @@ const Index = () => {
 
   const isLoading = tournamentsLoading || leaderboardLoading;
 
+  // Auto-refresh leaderboard every 5 seconds
+  useEffect(() => {
+    const id = setInterval(() => {
+      refetchSilent();
+    }, 5000);
+    return () => clearInterval(id);
+  }, [refetchSilent]);
+
   return (
     <div className="relative min-h-screen text-white overflow-hidden">
-      {/* Animated Background */}
-      <AnimatedBackground />
-      
       {/* Navigation */}
       <NewNavbar />
-      
-      {/* Main Content */}
-      <div className="relative z-10 pb-20">
-        {/* Hero Section */}
-        <NewPrizeHero 
-          prizeAmount="$5,000" 
-          period="Monthly"
-          description={BRANDING.customText?.heroDescription || `Sign up using referral code ${BRANDING.customText?.referralCode || BRANDING.streamerName} and start wagering to compete for prizes`}
-          streamerName={BRANDING.streamerName}
-        />
-        
-        {/* Countdown Timer */}
-        <div className="px-4 sm:px-6 mt-12">
-          <NewCountdownTimer 
-            startAt={countdownStartAt} 
-            endAt={countdownEndAt} 
-            forceZero={BRANDING.streamerCode === 'butcher'}
-          />
 
-          {BRANDING.streamerCode === 'butcher' && (
-            <div className="mt-4 mx-auto max-w-3xl rounded-xl border p-4 text-center"
-              style={{ 
-                borderColor: 'rgba(220, 20, 60, 0.35)',
-                background: 'rgba(26, 0, 0, 0.6)'
-              }}
-            >
-              <p className="text-sm sm:text-base font-semibold text-white">
-                We Will Be Processing Manual Payouts Due To Wagering Issues Related to OTC Sportsbets
-              </p>
-              <p className="text-xs sm:text-sm text-white/80 mt-1">
-                Winners Will Be Contacted And Awarded Within 12 hours
-              </p>
-            </div>
-          )}
-        </div>
-        
-        {/* Period Toggle */}
-        <PeriodToggle />
-        
-        {/* Podium Section - Only show if we have top 3 */}
-        {!isLoading && topThree.length > 0 && <NewPodiumSection topThree={topThree} />}
-        
-        {/* Leaderboard Table - Shows empty state if no data */}
+      {/* New Mike leaderboard UI only */}
+      <div className="relative z-10 pb-20 mt-8 sm:mt-12">
         {!isLoading && (
-          <>
-            {restOfLeaderboard.length > 0 ? (
-              <NewLeaderboardTable 
-                entries={restOfLeaderboard
-                  .filter((e) => getHardcodedPrize(e.rank) !== '0')
-                  .filter((e) => e.rank <= 18)} 
-                currentUser={currentUser} 
-              />
-            ) : topThree.length === 0 ? (
-              <NewLeaderboardTable entries={[]} currentUser={currentUser} />
-            ) : null}
-          </>
-        )}
-        
-        {/* Error Message */}
-        {error && !isLoading && (
-          <div className="mx-auto max-w-5xl px-4 mb-8">
-            <div className="rounded-2xl bg-red-500/10 border border-red-500/20 p-4">
-              <p className="text-red-400 text-sm">
-                ⚠️ {error}
-              </p>
-            </div>
-          </div>
+          <MikeLeaderboard
+            topThree={topThree}
+            entries={restOfLeaderboard}
+            startAt={countdownStartAt}
+            endAt={countdownEndAt}
+          />
         )}
       </div>
     </div>
