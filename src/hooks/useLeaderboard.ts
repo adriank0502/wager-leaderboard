@@ -311,21 +311,37 @@ export function useLeaderboard({
     me: false,
   }));
 
-  const fetchLeaderboard = useCallback(async () => {
+  const shallowEqual = (a: LeaderboardEntry[], b: LeaderboardEntry[]) => {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+      const x = a[i];
+      const y = b[i];
+      if (x.rank !== y.rank) return false;
+      if (x.player?.uuid !== y.player?.uuid) return false;
+      if (x.value !== y.value) return false;
+      if (x.prize?.amount !== y.prize?.amount) return false;
+    }
+    return true;
+  };
+
+  const fetchLeaderboard = useCallback(async (opts?: { silent?: boolean }) => {
+    const silent = opts?.silent === true;
     // Guard: Only bail if neither tournamentId nor csvUrl is provided
     if ((!tournamentId || tournamentId.trim() === '') && !csvUrl) {
-      setIsLoading(false);
+      if (!silent) setIsLoading(false);
       return;
     }
 
-    setIsLoading(true);
+    if (!silent) setIsLoading(true);
     setError(null);
 
     try {
       if (useMockData) {
         // Simulate API delay
         await new Promise((resolve) => setTimeout(resolve, 800));
-        setData(mockDataWithMe);
+        if (!shallowEqual(data, mockDataWithMe)) {
+          setData(mockDataWithMe);
+        }
         setHasMore(false);
         setCurrentUser(null);
       } else {
@@ -393,18 +409,22 @@ export function useLeaderboard({
           }
         }
 
-        setData(finalData);
+        if (!shallowEqual(data, finalData)) {
+          setData(finalData);
+        }
         setCurrentUser(userEntry);
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred';
-      setError(errorMessage);
-      // Fall back to mock data on error
-      setData(mockDataWithMe);
+      if (!silent) {
+        setError(errorMessage);
+        // Fall back to mock data on error
+        setData(mockDataWithMe);
+      }
     } finally {
-      setIsLoading(false);
+      if (!silent) setIsLoading(false);
     }
-  }, [tournamentId, useMockData, apiHost, includeMe, csvUrl]);
+  }, [tournamentId, useMockData, apiHost, includeMe, csvUrl, data]);
 
   useEffect(() => {
     // Fetch if we have a valid tournament ID OR a csvUrl override
@@ -430,6 +450,7 @@ export function useLeaderboard({
     isLoading,
     error,
     hasMore,
-    refetch: fetchLeaderboard,
+    refetch: () => fetchLeaderboard({ silent: false }),
+    refetchSilent: () => fetchLeaderboard({ silent: true }),
   };
 }
