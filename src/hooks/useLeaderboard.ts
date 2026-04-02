@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { LeaderboardEntry, LeaderboardResponse } from '@/types/leaderboard';
 
 // Mock data for development
@@ -304,6 +304,12 @@ export function useLeaderboard({
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [currentUser, setCurrentUser] = useState<LeaderboardEntry | null>(null);
+  const dataRef = useRef<LeaderboardEntry[]>(data);
+  useEffect(() => {
+    dataRef.current = data;
+  }, [data]);
+  const inFlightRef = useRef<Promise<void> | null>(null);
+  const lastFetchAtRef = useRef<number>(0);
 
   // Add mock "me" field to mock data for testing
   const mockDataWithMe = mockData.map(entry => ({
@@ -326,6 +332,16 @@ export function useLeaderboard({
 
   const fetchLeaderboard = useCallback(async (opts?: { silent?: boolean }) => {
     const silent = opts?.silent === true;
+
+    // Avoid duplicate/parallel fetches (StrictMode or fast re-triggers)
+    const nowTs = Date.now();
+    if (inFlightRef.current) {
+      return inFlightRef.current;
+    }
+    if (nowTs - lastFetchAtRef.current < 750) {
+      return;
+    }
+    lastFetchAtRef.current = nowTs;
     // Guard: Only bail if neither tournamentId nor csvUrl is provided
     if ((!tournamentId || tournamentId.trim() === '') && !csvUrl) {
       if (!silent) setIsLoading(false);
@@ -339,7 +355,7 @@ export function useLeaderboard({
       if (useMockData) {
         // Simulate API delay
         await new Promise((resolve) => setTimeout(resolve, 800));
-        if (!shallowEqual(data, mockDataWithMe)) {
+        if (!shallowEqual(dataRef.current, mockDataWithMe)) {
           setData(mockDataWithMe);
         }
         setHasMore(false);
@@ -412,7 +428,7 @@ export function useLeaderboard({
         // Stable merge by player.uuid to preserve object identity for unchanged rows
         if (finalData && finalData.length > 0) {
           const prevByUuid = new Map<string, LeaderboardEntry>(
-            (data || []).map((e) => [e.player?.uuid, e])
+            (dataRef.current || []).map((e) => [e.player?.uuid, e])
           );
           const merged: LeaderboardEntry[] = finalData
             .slice()
@@ -430,11 +446,11 @@ export function useLeaderboard({
               return incoming;
             });
 
-          if (!shallowEqual(data, merged)) {
+          if (!shallowEqual(dataRef.current, merged)) {
             setData(merged);
           }
         } else {
-          if (!shallowEqual(data, finalData)) {
+          if (!shallowEqual(dataRef.current, finalData)) {
             setData(finalData);
           }
         }
@@ -449,8 +465,9 @@ export function useLeaderboard({
       }
     } finally {
       if (!silent) setIsLoading(false);
+      inFlightRef.current = null;
     }
-  }, [tournamentId, useMockData, apiHost, includeMe, csvUrl, data]);
+  }, [tournamentId, useMockData, apiHost, includeMe, csvUrl]);
 
   useEffect(() => {
     // Fetch if we have a valid tournament ID OR a csvUrl override
@@ -463,10 +480,10 @@ export function useLeaderboard({
       setCurrentUser(null);
       setHasMore(false);
     }
-  }, [fetchLeaderboard, tournamentId]);
+  }, [tournamentId, apiHost, includeMe, csvUrl, useMockData]);
 
-  const topThree = data.filter((entry) => entry.rank <= 3);
-  const restOfLeaderboard = data.filter((entry) => entry.rank > 3);
+  const topThree = useMemo(() => data.filter((entry) => entry.rank <= 3), [data]);
+  const restOfLeaderboard = useMemo(() => data.filter((entry) => entry.rank > 3), [data]);
 
   return {
     data,

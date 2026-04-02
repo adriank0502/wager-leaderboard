@@ -1,6 +1,6 @@
 import { LeaderboardEntry } from '@/types/leaderboard';
 import { BRANDING } from '@/config/branding';
-import { useEffect, useMemo, useState } from 'react';
+import React, { memo, useEffect, useMemo, useState } from 'react';
 
 interface MikeLeaderboardProps {
   topThree: LeaderboardEntry[];
@@ -47,35 +47,33 @@ const CurrencyDot = ({ size = 18, color = '#2ecf9a' }: { size?: number; color?: 
   </span>
 );
 
-export function MikeLeaderboard({ topThree, entries, startAt, endAt }: MikeLeaderboardProps) {
+export const MikeLeaderboard = memo(function MikeLeaderboard({ topThree, entries, startAt, endAt }: MikeLeaderboardProps) {
+  return <_MikeLeaderboardInner topThree={topThree} entries={entries} startAt={startAt} endAt={endAt} />;
+}, (prev, next) => {
+  // Avoid re-render unless leaderboard props change
+  const sameTop =
+    prev.topThree.length === next.topThree.length &&
+    prev.topThree.every((a, i) => {
+      const b = next.topThree[i];
+      return a && b && a.rank === b.rank && a.player.uuid === b.player.uuid && a.value === b.value && a.prize?.amount === b.prize?.amount;
+    });
+  const sameEntries =
+    prev.entries.length === next.entries.length &&
+    prev.entries.every((a, i) => {
+      const b = next.entries[i];
+      return a && b && a.rank === b.rank && a.player.uuid === b.player.uuid && a.value === b.value && a.prize?.amount === b.prize?.amount;
+    });
+  return sameTop && sameEntries && prev.endAt === next.endAt && prev.startAt === next.startAt;
+});
+
+export function _MikeLeaderboardInner({ topThree, entries, startAt, endAt }: MikeLeaderboardProps) {
   const first = topThree.find(e => e.rank === 1);
   const second = topThree.find(e => e.rank === 2);
   const third = topThree.find(e => e.rank === 3);
 
   const podium = [second, first, third].filter(Boolean) as LeaderboardEntry[];
-  const isButcherTheme = BRANDING.streamerCode === 'butcher';
   const getVipIcon = (e: LeaderboardEntry) =>
     (e.player?.vip as any)?.cms_property?.icon?.path as string | undefined;
-
-  // Live countdown to endAt
-  const [now, setNow] = useState<number>(() => Date.now());
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(id);
-  }, []);
-
-  const countdown = useMemo(() => {
-    const endMs = endAt ? new Date(endAt).getTime() : null;
-    if (!endMs) return { d: '00', h: '00', m: '00', s: '00' };
-    const diff = Math.max(0, endMs - now);
-    const total = Math.floor(diff / 1000);
-    const d = Math.floor(total / 86400);
-    const h = Math.floor((total % 86400) / 3600);
-    const m = Math.floor((total % 3600) / 60);
-    const s = total % 60;
-    const pad = (n: number) => String(n).padStart(2, '0');
-    return { d: pad(d), h: pad(h), m: pad(m), s: pad(s) };
-  }, [endAt, now]);
 
   return (
     <div className="max-w-[1080px] mx-auto px-4">
@@ -200,17 +198,7 @@ export function MikeLeaderboard({ topThree, entries, startAt, endAt }: MikeLeade
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 overflow-x-auto">
-          {[`${countdown.d}d`, `${countdown.h}h`, `${countdown.m}m`, `${countdown.s}s`].map((pill) => (
-            <div
-              key={pill}
-              className="min-w-[66px] text-center rounded-[8px] px-2 py-2 font-extrabold text-base"
-              style={{ background: '#23273a', border: '1px solid rgba(255,255,255,0.04)', color: '#f4f7ff' }}
-            >
-              {pill}
-            </div>
-          ))}
-        </div>
+        <LiveTimer endAt={endAt} />
       </section>
 
       {/* Table */}
@@ -228,50 +216,99 @@ export function MikeLeaderboard({ topThree, entries, startAt, endAt }: MikeLeade
             </tr>
           </thead>
           <tbody>
-            {entries.map((e, idx) => (
-              <tr
-                key={e.player.uuid}
-                className="transition-colors"
-                style={{
-                  // Use rank-based striping so rows don't flip colors on refresh
-                  background: e.rank % 2 === 0 ? '#0a0f1a' : '#0c1120',
-                }}
-              >
-                <td className="p-[8px_14px] border-b font-black text-white" style={{ borderColor: 'rgba(120,140,180,0.16)' }}>{e.rank}.</td>
-                <td className="p-[8px_14px] border-b" style={{ borderColor: 'rgba(120,140,180,0.16)' }}>
-                  <div className="flex items-center gap-2">
-                    {getVipIcon(e) && (
-                      <div className="w-[18px] h-[18px] rounded-full overflow-hidden border flex-shrink-0 bg-[#0e1422]" style={{ borderColor: 'rgba(255,255,255,0.14)' }}>
-                        <img
-                          src={getVipIcon(e)}
-                          alt="VIP"
-                          className="w-full h-full object-contain"
-                          onError={(ev) => { (ev.currentTarget as HTMLImageElement).style.display = 'none'; }}
-                        />
-                      </div>
-                    )}
-                    <span className="font-extrabold text-white text-sm sm:text-base leading-tight">{displayUsername(e.player.username)}</span>
-                  </div>
-                </td>
-                <td className="p-[8px_14px] border-b" style={{ borderColor: 'rgba(120,140,180,0.16)' }}>
-                  <span className="inline-flex items-center gap-2">
-                    <CurrencyDot size={18} color="#2ecf9a" />
-                    <span className="font-extrabold text-white text-sm sm:text-base leading-tight">{formatValue(e.value)}</span>
-                  </span>
-                </td>
-                <td className="p-[8px_14px] border-b text-right" style={{ borderColor: 'rgba(120,140,180,0.16)' }}>
-                  <span className="inline-flex items-center gap-2 justify-end w-full">
-                    <CurrencyDot size={18} color="#2ecf9a" />
-                    <span className="font-extrabold text-white text-sm sm:text-base leading-tight">
-                      {formatValue(e.prize?.amount ?? '0')}
-                    </span>
-                  </span>
-                </td>
-              </tr>
+            {entries.map((e) => (
+              <Row key={e.player.uuid} entry={e} />
             ))}
           </tbody>
         </table>
       </section>
+    </div>
+  );
+}
+
+const Row = memo(function Row({ entry }: { entry: LeaderboardEntry }) {
+  const getVipIcon = (e: LeaderboardEntry) =>
+    (e.player?.vip as any)?.cms_property?.icon?.path as string | undefined;
+  return (
+    <tr
+      className="transition-colors"
+      style={{
+        background: entry.rank % 2 === 0 ? '#0a0f1a' : '#0c1120',
+      }}
+    >
+      <td className="p-[8px_14px] border-b font-black text-white" style={{ borderColor: 'rgba(120,140,180,0.16)' }}>{entry.rank}.</td>
+      <td className="p-[8px_14px] border-b" style={{ borderColor: 'rgba(120,140,180,0.16)' }}>
+        <div className="flex items-center gap-2">
+          {getVipIcon(entry) && (
+            <div className="w-[18px] h-[18px] rounded-full overflow-hidden border flex-shrink-0 bg-[#0e1422]" style={{ borderColor: 'rgba(255,255,255,0.14)' }}>
+              <img
+                src={getVipIcon(entry)}
+                alt="VIP"
+                className="w-full h-full object-contain"
+                onError={(ev) => { (ev.currentTarget as HTMLImageElement).style.display = 'none'; }}
+              />
+            </div>
+          )}
+          <span className="font-extrabold text-white text-sm sm:text-base leading-tight">{displayUsername(entry.player.username)}</span>
+        </div>
+      </td>
+      <td className="p-[8px_14px] border-b" style={{ borderColor: 'rgba(120,140,180,0.16)' }}>
+        <span className="inline-flex items-center gap-2">
+          <CurrencyDot size={18} color="#2ecf9a" />
+          <span className="font-extrabold text-white text-sm sm:text-base leading-tight">{formatValue(entry.value)}</span>
+        </span>
+      </td>
+      <td className="p-[8px_14px] border-b text-right" style={{ borderColor: 'rgba(120,140,180,0.16)' }}>
+        <span className="inline-flex items-center gap-2 justify-end w-full">
+          <CurrencyDot size={18} color="#2ecf9a" />
+          <span className="font-extrabold text-white text-sm sm:text-base leading-tight">
+            {formatValue(entry.prize?.amount ?? '0')}
+          </span>
+        </span>
+      </td>
+    </tr>
+  );
+}, (prev, next) => {
+  const a = prev.entry;
+  const b = next.entry;
+  return (
+    a.rank === b.rank &&
+    a.value === b.value &&
+    a.prize?.amount === b.prize?.amount &&
+    a.player?.uuid === b.player?.uuid &&
+    a.player?.username === b.player?.username
+  );
+});
+
+function LiveTimer({ endAt }: { endAt?: string | null }) {
+  const [now, setNow] = useState<number>(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const countdown = useMemo(() => {
+    const endMs = endAt ? new Date(endAt).getTime() : null;
+    if (!endMs) return { d: '00', h: '00', m: '00', s: '00' };
+    const diff = Math.max(0, endMs - now);
+    const total = Math.floor(diff / 1000);
+    const d = Math.floor(total / 86400);
+    const h = Math.floor((total % 86400) / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const s = total % 60;
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return { d: pad(d), h: pad(h), m: pad(m), s: pad(s) };
+  }, [endAt, now]);
+  return (
+    <div className="flex items-center gap-1.5 overflow-x-auto">
+      {[`${countdown.d}d`, `${countdown.h}h`, `${countdown.m}m`, `${countdown.s}s`].map((pill) => (
+        <div
+          key={pill}
+          className="min-w-[66px] text-center rounded-[8px] px-2 py-2 font-extrabold text-base"
+          style={{ background: '#23273a', border: '1px solid rgba(255,255,255,0.04)', color: '#f4f7ff' }}
+        >
+          {pill}
+        </div>
+      ))}
     </div>
   );
 }

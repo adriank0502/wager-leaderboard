@@ -58,7 +58,7 @@ const Index = () => {
       refetchSilent();
     }, 5000);
     return () => clearInterval(id);
-  }, [refetchSilent]);
+  }, [tournamentId]); // stable interval; only resets if tournament changes
 
   return (
     <div className="relative min-h-screen text-white overflow-hidden">
