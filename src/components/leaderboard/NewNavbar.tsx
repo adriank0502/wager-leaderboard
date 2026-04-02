@@ -6,16 +6,19 @@ import { BRANDING } from '@/config/branding';
 export function NewNavbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isButcherTheme = BRANDING.streamerCode === 'butcher';
-  const primaryColor = isButcherTheme ? BRANDING.theme.secondaryColor : '#85C7FF';
+  // Orange-friendly header palette for Butcher theme
+  const headerPrimary = isButcherTheme ? '#FF9F43' : '#85C7FF'; // warm orange vs blue
+  const headerAccent = isButcherTheme ? '#FF7A18' : '#99D0FF';
+  const primaryColor = isButcherTheme ? headerPrimary : '#85C7FF';
   const referralCode = BRANDING.customText?.referralCode || BRANDING.streamerName;
   const signupUrl = isButcherTheme 
     ? `https://wager.com/signup/?raf=${referralCode}` 
     : "https://wager.com";
   const bgGradient = isButcherTheme
-    ? `linear-gradient(135deg, ${BRANDING.theme.secondaryColor}15 0%, rgba(26, 0, 0, 0.5) 50%, ${BRANDING.theme.primaryColor}10 100%)`
+    ? `linear-gradient(135deg, ${headerPrimary}22 0%, rgba(26, 12, 0, 0.55) 50%, ${headerAccent}18 100%)`
     : 'linear-gradient(135deg, rgba(133, 199, 255, 0.05) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(153, 208, 255, 0.05) 100%)';
-  const borderColor = isButcherTheme ? `${primaryColor}30` : 'rgba(255, 255, 255, 0.1)';
-  const highlightColor = isButcherTheme ? `${primaryColor}60` : 'rgba(255, 255, 255, 0.3)';
+  const borderColor = isButcherTheme ? `${headerPrimary}35` : 'rgba(255, 255, 255, 0.1)';
+  const highlightColor = isButcherTheme ? `${headerPrimary}66` : 'rgba(255, 255, 255, 0.3)';
 
   return (
     <>
@@ -36,7 +39,7 @@ export function NewNavbar() {
             className="absolute inset-0 rounded-[inherit] pointer-events-none opacity-50"
             style={{
               background: isButcherTheme
-                ? `linear-gradient(to bottom right, ${primaryColor}20, transparent, transparent)`
+                ? `linear-gradient(to bottom right, ${headerPrimary}28, transparent, transparent)`
                 : 'linear-gradient(to bottom right, rgba(255, 255, 255, 0.1), transparent, transparent)',
             }}
           />
@@ -46,7 +49,7 @@ export function NewNavbar() {
             className="absolute top-0 left-[10%] right-[10%] h-[2px]"
             style={{
               background: `linear-gradient(to right, transparent, ${highlightColor}, transparent)`,
-              boxShadow: isButcherTheme ? `0 0 10px ${primaryColor}40` : undefined,
+              boxShadow: isButcherTheme ? `0 0 10px ${headerPrimary}40` : undefined,
             }}
           />
           
@@ -57,18 +60,18 @@ export function NewNavbar() {
                 className="relative w-11 h-11 rounded-full p-[2px] transition-all duration-300"
                 style={{
                   background: isButcherTheme
-                    ? `linear-gradient(to bottom right, ${primaryColor}60, ${BRANDING.theme.accentColor}60)`
+                    ? `linear-gradient(to bottom right, ${headerPrimary}70, ${headerAccent}70)`
                     : 'linear-gradient(to bottom right, rgba(133, 199, 255, 0.4), rgba(153, 208, 255, 0.4))',
-                  boxShadow: isButcherTheme ? `0 0 20px ${primaryColor}40` : undefined,
+                  boxShadow: isButcherTheme ? `0 0 20px ${headerPrimary}40` : undefined,
                 }}
                 onMouseEnter={(e) => {
                   if (isButcherTheme) {
-                    e.currentTarget.style.boxShadow = `0 0 30px ${primaryColor}60`;
+                    e.currentTarget.style.boxShadow = `0 0 30px ${headerPrimary}60`;
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (isButcherTheme) {
-                    e.currentTarget.style.boxShadow = `0 0 20px ${primaryColor}40`;
+                    e.currentTarget.style.boxShadow = `0 0 20px ${headerPrimary}40`;
                   }
                 }}
               >
@@ -76,7 +79,7 @@ export function NewNavbar() {
                   className="w-full h-full rounded-full flex items-center justify-center overflow-hidden"
                   style={{
                     background: isButcherTheme
-                      ? 'linear-gradient(to bottom right, #1a0000, #2d0000)'
+                      ? 'linear-gradient(to bottom right, #2a1500, #3d1c00)'
                       : 'linear-gradient(to bottom right, #1e2642, #1a1f3a)',
                   }}
                 >
@@ -91,8 +94,8 @@ export function NewNavbar() {
                 <span 
                   className="font-black text-base leading-none tracking-tight"
                   style={{
-                    color: isButcherTheme ? primaryColor : '#FFFFFF',
-                    textShadow: isButcherTheme ? `0 0 10px ${primaryColor}60` : undefined,
+                    color: isButcherTheme ? headerPrimary : '#FFFFFF',
+                    textShadow: isButcherTheme ? `0 0 10px ${headerPrimary}60` : undefined,
                   }}
                 >
                   {BRANDING.streamerName}
@@ -111,8 +114,8 @@ export function NewNavbar() {
               <span 
                 className="relative px-5 py-2.5 text-sm font-black transition-all duration-300 group/link rounded-xl cursor-default"
                 style={{
-                  color: isButcherTheme ? primaryColor : '#FFFFFF',
-                  textShadow: isButcherTheme ? `0 0 8px ${primaryColor}40` : undefined,
+                  color: isButcherTheme ? headerPrimary : '#FFFFFF',
+                  textShadow: isButcherTheme ? `0 0 8px ${headerPrimary}40` : undefined,
                 }}
               >
                 Leaderboard
@@ -120,10 +123,10 @@ export function NewNavbar() {
                   className="absolute left-1/2 bottom-1 w-0 h-[3px] rounded-full -translate-x-1/2 group-hover/link:w-8 transition-all duration-300"
                   style={{
                     background: isButcherTheme
-                      ? `linear-gradient(to right, ${primaryColor}, ${BRANDING.theme.accentColor})`
+                      ? `linear-gradient(to right, ${headerPrimary}, ${headerAccent})`
                       : 'linear-gradient(to right, #85C7FF, #99D0FF)',
                     boxShadow: isButcherTheme
-                      ? `0 0 15px ${primaryColor}`
+                      ? `0 0 15px ${headerPrimary}`
                       : '0 0 8px #85C7FF',
                   }}
                 />
@@ -140,21 +143,21 @@ export function NewNavbar() {
               className="group/cta relative inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full overflow-hidden transition-all duration-300"
               style={{
                 background: isButcherTheme
-                  ? `linear-gradient(to right, ${primaryColor}, ${BRANDING.theme.accentColor})`
+                  ? `linear-gradient(to right, ${headerPrimary}, ${headerAccent})`
                   : 'linear-gradient(to right, #85C7FF, #99D0FF)',
                 boxShadow: isButcherTheme
-                  ? `0 0 20px ${primaryColor}50, 0 4px 15px rgba(139, 0, 0, 0.3)`
+                  ? `0 0 20px ${headerPrimary}50, 0 4px 15px rgba(96, 48, 0, 0.35)`
                   : '0 4px 15px rgba(0, 0, 0, 0.2)',
               }}
               onMouseEnter={(e) => {
                 if (isButcherTheme) {
-                  e.currentTarget.style.boxShadow = `0 0 35px ${primaryColor}80, 0 6px 20px rgba(139, 0, 0, 0.5)`;
+                  e.currentTarget.style.boxShadow = `0 0 35px ${headerPrimary}80, 0 6px 20px rgba(96, 48, 0, 0.55)`;
                   e.currentTarget.style.transform = 'scale(1.05)';
                 }
               }}
               onMouseLeave={(e) => {
                 if (isButcherTheme) {
-                  e.currentTarget.style.boxShadow = `0 0 20px ${primaryColor}50, 0 4px 15px rgba(139, 0, 0, 0.3)`;
+                  e.currentTarget.style.boxShadow = `0 0 20px ${headerPrimary}50, 0 4px 15px rgba(96, 48, 0, 0.35)`;
                   e.currentTarget.style.transform = 'scale(1)';
                 }
               }}
@@ -177,9 +180,9 @@ export function NewNavbar() {
             <div 
               className="p-1.5 backdrop-blur-md border rounded-full shadow-lg"
               style={{
-                background: isButcherTheme ? 'rgba(26, 0, 0, 0.8)' : 'rgba(11, 16, 27, 0.8)',
-                borderColor: isButcherTheme ? `${primaryColor}30` : 'rgba(255, 255, 255, 0.1)',
-                boxShadow: isButcherTheme ? `0 4px 15px rgba(139, 0, 0, 0.3), 0 0 20px ${primaryColor}20` : undefined,
+                background: isButcherTheme ? 'rgba(41, 20, 0, 0.82)' : 'rgba(11, 16, 27, 0.8)',
+                borderColor: isButcherTheme ? `${headerPrimary}30` : 'rgba(255, 255, 255, 0.1)',
+                boxShadow: isButcherTheme ? `0 4px 15px rgba(96, 48, 0, 0.35), 0 0 20px ${headerPrimary}20` : undefined,
               }}
             >
               <a className="block w-7 h-7 rounded-full overflow-hidden" href="/">

@@ -193,12 +193,25 @@ export function _MikeLeaderboardInner({ topThree, entries, startAt, endAt }: Mik
           <div>
             <div className="text-white text-lg font-extrabold leading-tight">Total Wager</div>
             <div className="text-[#d0d2db] text-xs font-medium leading-snug">
-              Wager to climb the leaderboard for your shot at a $5,000 top prize!
+              Wager to climb the leaderboard for your shot at a $50,000 top prize!
             </div>
           </div>
         </div>
 
         <LiveTimer endAt={endAt} />
+      </section>
+      
+      {/* Notice box (below table) */}
+      <section
+        className="w-full max-w-[828px] mx-auto mt-6 mb-12 rounded-[12px] border px-4 py-4"
+        style={{ background: '#0d111b', borderColor: 'rgba(255,159,67,0.35)' }}
+      >
+        <div className="text-[#FF9F43] font-black tracking-wide mb-1">NOTICE</div>
+        <p className="text-[#d0d2db] text-sm leading-relaxed">
+          After Discussing With Wager.com Management, They Allowed Me To Combine My LB With A Private Invite Only LB
+          They Were Running Internally. I Strive To Give My Players The Best Rewards, And Based On The Volumes on the
+          LB, I felt this Solution is Fair, and More Rewarding for Players, Good Luck
+        </p>
       </section>
 
       {/* Table */}
