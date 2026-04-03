@@ -71,9 +71,25 @@ export function _MikeLeaderboardInner({ topThree, entries, startAt, endAt }: Mik
   const second = topThree.find(e => e.rank === 2);
   const third = topThree.find(e => e.rank === 3);
 
-  const podium = [second, first, third].filter(Boolean) as LeaderboardEntry[];
+  // Mobile: 1,2,3 order; Desktop: 2,1,3 (center winner)
+  const podium = [first, second, third].filter(Boolean) as LeaderboardEntry[];
   const getVipIcon = (e: LeaderboardEntry) =>
     (e.player?.vip as any)?.cms_property?.icon?.path as string | undefined;
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [page, setPage] = useState<number>(1);
+  const mobilePageSize = 10;
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 640px)');
+    const onChange = () => setIsMobile(mq.matches);
+    onChange();
+    mq.addEventListener?.('change', onChange);
+    return () => mq.removeEventListener?.('change', onChange);
+  }, []);
+
+  useEffect(() => {
+    setPage(1);
+  }, [isMobile]);
 
   return (
     <div className="max-w-[1080px] mx-auto px-4">
@@ -88,10 +104,15 @@ export function _MikeLeaderboardInner({ topThree, entries, startAt, endAt }: Mik
 
       {/* Top 3 */}
       <section className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 items-stretch justify-center max-w-[828px] mx-auto mt-8 mb-8 sm:mb-12">
-        {podium.map((p) => (
+        {podium.map((p) => {
+          const orderClass =
+            p.rank === 1 ? 'order-1 sm:order-2' :
+            p.rank === 2 ? 'order-2 sm:order-1' :
+            'order-3 sm:order-3';
+          return (
           <article
             key={p.rank}
-            className={`relative rounded-[18px] p-4 pt-6 flex flex-col items-center gap-2 w-full sm:w-[260px] min-h-[240px] sm:min-h-[260px] border`}
+            className={`relative rounded-[18px] p-4 pt-6 flex flex-col items-center gap-2 w-full sm:w-[260px] min-h-[240px] sm:min-h-[260px] border ${orderClass}`}
             style={{
               backgroundImage: `linear-gradient(180deg, rgba(12,14,24,0.28) 0%, rgba(12,14,24,0.62) 100%), url('/mike-assets/images/bg-rank.png')`,
               backgroundSize: 'cover',
@@ -176,29 +197,33 @@ export function _MikeLeaderboardInner({ topThree, entries, startAt, endAt }: Mik
               </span>
             </div>
           </article>
-        ))}
+        )})}
       </section>
 
       {/* Total Wager + live timer section */}
       <section
-        className="w-full max-w-[828px] mx-auto mt-4 mb-6 flex items-center justify-between gap-4 rounded-[10px] border px-4 py-3"
+        className="w-full max-w-[828px] mx-auto mt-4 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 rounded-[10px] border px-3 py-3 sm:px-4"
         style={{ background: '#0d111b', borderColor: 'rgba(255,255,255,0.10)' }}
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <img
-            className="w-9 h-9 rounded-full object-contain"
+            className="w-7 h-7 sm:w-9 sm:h-9 rounded-full object-contain"
             src="https://cdn-cms.wgrcsnapi.com/rb-4x.png"
             alt="Total wager"
           />
           <div>
-            <div className="text-white text-lg font-extrabold leading-tight">Total Wager</div>
-            <div className="text-[#d0d2db] text-xs font-medium leading-snug">
+            <div className="text-white text-base sm:text-lg font-extrabold leading-tight">Total Wager</div>
+            <div className="text-[#d0d2db] text-[11px] sm:text-xs font-medium leading-snug">
               Wager to climb the leaderboard for your shot at a $50,000 top prize!
             </div>
           </div>
         </div>
 
-        <LiveTimer endAt={endAt} />
+        <div className="w-full sm:w-auto">
+          <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto">
+            <LiveTimer endAt={endAt} />
+          </div>
+        </div>
       </section>
       
       {/* Notice box (below table) */}
@@ -229,12 +254,49 @@ export function _MikeLeaderboardInner({ topThree, entries, startAt, endAt }: Mik
             </tr>
           </thead>
           <tbody>
-            {entries.map((e) => (
+            {(isMobile
+              ? entries.filter((e) => e.rank > 3).slice((page - 1) * mobilePageSize, page * mobilePageSize)
+              : entries.filter((e) => e.rank > 3)
+            ).map((e) => (
               <Row key={e.player.uuid} entry={e} />
             ))}
           </tbody>
         </table>
       </section>
+
+      {isMobile && (
+        <div className="sm:hidden w-full max-w-[828px] mx-auto mt-3 mb-6 flex items-center justify-between">
+          {(() => {
+            const total = Math.ceil(Math.max(0, entries.filter((e) => e.rank > 3).length) / mobilePageSize) || 1;
+            const canPrev = page > 1;
+            const canNext = page < total;
+            return (
+              <>
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={!canPrev}
+                  className="px-3 py-1.5 rounded border text-sm disabled:opacity-40"
+                  style={{ background: '#0d111b', borderColor: 'rgba(255,255,255,0.12)' }}
+                >
+                  Prev
+                </button>
+                <div className="text-xs text-[#aab2c4]">
+                  Page <span className="text-white font-semibold">{page}</span> / {total}
+                </div>
+                <button
+                  onClick={() => setPage((p) => Math.min(total, p + 1))}
+                  disabled={!canNext}
+                  className="px-3 py-1.5 rounded border text-sm disabled:opacity-40"
+                  style={{ background: '#0d111b', borderColor: 'rgba(255,255,255,0.12)' }}
+                >
+                  Next
+                </button>
+              </>
+            );
+          })()}
+        </div>
+      )
+      }
     </div>
   );
 }
@@ -312,16 +374,16 @@ function LiveTimer({ endAt }: { endAt?: string | null }) {
     return { d: pad(d), h: pad(h), m: pad(m), s: pad(s) };
   }, [endAt, now]);
   return (
-    <div className="flex items-center gap-1.5 overflow-x-auto">
+    <>
       {[`${countdown.d}d`, `${countdown.h}h`, `${countdown.m}m`, `${countdown.s}s`].map((pill) => (
         <div
           key={pill}
-          className="min-w-[66px] text-center rounded-[8px] px-2 py-2 font-extrabold text-base"
+          className="min-w-[52px] sm:min-w-[66px] text-center rounded-[8px] px-2 py-1.5 sm:py-2 font-extrabold text-sm sm:text-base"
           style={{ background: '#23273a', border: '1px solid rgba(255,255,255,0.04)', color: '#f4f7ff' }}
         >
           {pill}
         </div>
       ))}
-    </div>
+    </>
   );
 }
